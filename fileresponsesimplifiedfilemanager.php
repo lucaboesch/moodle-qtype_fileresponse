@@ -42,7 +42,7 @@ require_once($CFG->dirroot.'/repository/lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class MoodleQuickForm_fileresponsesimplifiedfilemanager extends HTML_QuickForm_element {
-    /** @var string html for help button, if empty then no help will icon will be dispalyed. */
+    /** @var string html for help button, if empty then no help will icon will be displayed. */
     public $_helpbutton = '';
 
     /** @var array options provided to initalize fileresponsesimplifiedfilemanager */
@@ -543,7 +543,7 @@ class qtype_fileresponse_fileresponsesimplifiedfilemanager_renderer extends plug
                 array('invalidjson', 'repository'), array('popupblockeddownload', 'repository'),
                 array('unknownoriginal', 'repository'), array('confirmdeletefolder', 'repository'),
                 array('confirmdeletefilewithhref', 'repository'), array('confirmrenamefolder', 'repository'),
-                array('confirmrenamefile', 'repository')
+                array('confirmrenamefile', 'repository'), array('newfolder', 'repository'), array('edit', 'moodle')
             )
         );
         if (empty($fileresponsesimplifiedfilemanagertemplateloaded)) {
@@ -636,10 +636,10 @@ class qtype_fileresponse_fileresponsesimplifiedfilemanager_renderer extends plug
                 <div class="fp-btn-mkdir">
                     <a role="button" title="'.$strmakedir.'" href="#"><img src="'.$this->pix_url('a/create_folder').'" alt="" /></a>
                 </div>
-                <div class="fp-btn-download">
+                <!-- <div class="fp-btn-download"> -->
                     <!--<a role="button" title="'.$strdownload.'" href="#"><img src="'.$this->pix_url('a/download_all').'" alt="" /></a>-->
                     <!-- don\'t download fix -->
-                </div>
+                <!-- </div> -->
                 <img class="fp-img-downloading" src="'.$this->pix_url('i/loading_small').'" alt="" />
             </div>
             <div class="fp-viewbar">
@@ -819,7 +819,7 @@ class qtype_fileresponse_fileresponsesimplifiedfilemanager_renderer extends plug
         <img src="'.$this->pix_url('i/loading_small').'" />
     </div>
     <form class="form-horizontal">
-        <button class="fp-file-download">'.get_string('download').'</button>
+        <!-- <button class="fp-file-download">'.get_string('download').'</button> -->
         <button class="fp-file-delete">'.get_string('delete').'</button>
         <button class="fp-file-setmain">'.get_string('setmainfile', 'repository').'</button>
         <span class="fp-file-setmain-help">'.$OUTPUT->help_icon('setmainfile', 'repository').'</span>
@@ -949,7 +949,8 @@ class qtype_fileresponse_fileresponsesimplifiedfilemanager_renderer extends plug
         // TODO MDL-32020 also should say about 'File types accepted'
         return '<span>'. $maxsize . '</span>';
     }
-/**
+
+    /**
      * Template for FilePicker with general layout (not QuickUpload).
      *
      * Must have one top element containing everything else (recommended <div class="file-picker">),
@@ -990,6 +991,88 @@ class qtype_fileresponse_fileresponsesimplifiedfilemanager_renderer extends plug
      * Other elements must have either <a> or <button> element inside, it will hold onclick
      * event for corresponding action; labels for fp-tb-back and fp-tb-logout may be
      * replaced with those specified by repository;
+     *
+     * @return string
+     */
+    private function fp_js_template_generallayout() {
+        $rv = '
+<div tabindex="0" class="file-picker fp-generallayout" role="dialog" aria-live="assertive">
+    <div class="fp-repo-area">
+        <ul class="fp-list">
+            <li class="fp-repo">
+                <a href="#"><img class="fp-repo-icon" alt=" " width="16" height="16" />&nbsp;<span class="fp-repo-name"></span></a>
+            </li>
+        </ul>
+    </div>
+    <div class="fp-repo-items" tabindex="0">
+        <div class="fp-navbar">
+            <div>
+                <div class="fp-toolbar">
+                    <div class="fp-tb-back">
+                        <a href="#">'.get_string('back', 'repository').'</a>
+                    </div>
+                    <div class="fp-tb-search">
+                        <form></form>
+                    </div>
+                    <div class="fp-tb-refresh">
+                        <a title="'. get_string('refresh', 'repository') .'" href="#">
+                            <img alt="" src="'.$this->pix_url('a/refresh').'" />
+                        </a>
+                    </div>
+                    <div class="fp-tb-logout">
+                        <a title="'. get_string('logout', 'repository') .'" href="#">
+                            <img alt="" src="'.$this->pix_url('a/logout').'" />
+                        </a>
+                    </div>
+                    <div class="fp-tb-manage">
+                        <a title="'. get_string('settings', 'repository') .'" href="#">
+                            <img alt="" src="'.$this->pix_url('a/setting').'" />
+                        </a>
+                    </div>
+                    <div class="fp-tb-help">
+                        <a title="'. get_string('help', 'repository') .'" href="#">
+                            <img alt="" src="'.$this->pix_url('a/help').'" />
+                        </a>
+                    </div>
+                    <div class="fp-tb-message"></div>
+                </div>
+                <div class="fp-viewbar">
+                    <a role="button" title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons" href="#">
+                        <img alt="" src="'. $this->pix_url('fp/view_icon_active', 'theme') .'" />
+                    </a>
+                    <a role="button" title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details" href="#">
+                        <img alt="" src="'. $this->pix_url('fp/view_list_active', 'theme') .'" />
+                    </a>
+                    <a role="button" title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree" href="#">
+                        <img alt="" src="'. $this->pix_url('fp/view_tree_active', 'theme') .'" />
+                    </a>
+                </div>
+                <div class="fp-clear-left"></div>
+            </div>
+            <div class="fp-pathbar">
+                 <span class="fp-path-folder"><a class="fp-path-folder-name" href="#"></a></span>
+            </div>
+        </div>
+        <div class="fp-content"></div>
+    </div>
+</div>';
+        return $rv;
+    }
+
+    /**
+     * FilePicker JS template for displaying one file in 'icon view' mode.
+     *
+     * the element with class 'fp-thumbnail' will be resized to the repository thumbnail size
+     * (both width and height, unless min-width and/or min-height is set in CSS) and the content of
+     * an element will be replaced with an appropriate img;
+     *
+     * the width of element with class 'fp-filename' will be set to the repository thumbnail width
+     * (unless min-width is set in css) and the content of an element will be replaced with filename
+     * supplied by repository;
+     *
+     * top element(s) will have class fp-folder if the element is a folder;
+     *
+     * List of files will have parent <div> element with class 'fp-iconview'
      *
      * @return string
      */

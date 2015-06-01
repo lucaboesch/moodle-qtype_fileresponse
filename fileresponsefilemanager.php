@@ -33,7 +33,7 @@ require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/repository/lib.php');
 
 /**
-    * Fileresponse filemanager form element
+ * Fileresponse filemanager form element
  *
  * Fileresponse filemanager lets user to upload/manage multiple files
  * @package   core_form
@@ -543,7 +543,7 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
                 array('invalidjson', 'repository'), array('popupblockeddownload', 'repository'),
                 array('unknownoriginal', 'repository'), array('confirmdeletefolder', 'repository'),
                 array('confirmdeletefilewithhref', 'repository'), array('confirmrenamefolder', 'repository'),
-                array('confirmrenamefile', 'repository')
+                array('confirmrenamefile', 'repository'), array('newfolder', 'repository'), array('edit', 'moodle')
             )
         );
         if (empty($fileresponsefilemanagertemplateloaded)) {
@@ -637,8 +637,7 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
                     <a role="button" title="'.$strmakedir.'" href="#"><img src="'.$this->pix_url('a/create_folder').'" alt="" /></a>
                 </div>
                 <div class="fp-btn-download">
-                    <!--<a role="button" title="'.$strdownload.'" href="#"><img src="'.$this->pix_url('a/download_all').'" alt="" /></a>-->
-                    <!-- don\'t download fix -->
+                    <a role="button" title="'.$strdownload.'" href="#"><img src="'.$this->pix_url('a/download_all').'" alt="" /></a>
                 </div>
                 <img class="fp-img-downloading" src="'.$this->pix_url('i/loading_small').'" alt="" />
             </div>
