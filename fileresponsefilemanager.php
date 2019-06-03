@@ -645,13 +645,13 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
             </div>
             <div class="fp-viewbar">
                 <a title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons" href="#">
-                    <img alt="" src="'. $this->pix_url('fp/view_icon_active', 'theme') .'" />
+                    <img alt="" src="'. $this->pix_url('fp/view_icon_active', 'theme') .'" class="icon"/>
                 </a>
                 <a title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details" href="#">
-                    <img alt="" src="'. $this->pix_url('fp/view_list_active', 'theme') .'" />
+                    <img alt="" src="'. $this->pix_url('fp/view_list_active', 'theme') .'" class="icon"/>
                 </a>
                 <a title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree" href="#">
-                    <img alt="" src="'. $this->pix_url('fp/view_tree_active', 'theme') .'" />
+                    <img alt="" src="'. $this->pix_url('fp/view_tree_active', 'theme') .'" class="icon"/>
                 </a>
             </div>
         </div>
