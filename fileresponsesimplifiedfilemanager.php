@@ -1039,13 +1039,13 @@ class qtype_fileresponse_fileresponsesimplifiedfilemanager_renderer extends plug
                 </div>
                 <div class="fp-viewbar">
                     <a role="button" title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons" href="#">
-                        <img alt="" src="'. $this->pix_url('fp/view_icon_active', 'theme') .'" />
+                        <img alt="" src="'. $this->pix_url('fp/view_icon_active', 'theme') .'" class="icon"/>
                     </a>
                     <a role="button" title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details" href="#">
-                        <img alt="" src="'. $this->pix_url('fp/view_list_active', 'theme') .'" />
+                        <img alt="" src="'. $this->pix_url('fp/view_list_active', 'theme') .'" class="icon"/>
                     </a>
                     <a role="button" title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree" href="#">
-                        <img alt="" src="'. $this->pix_url('fp/view_tree_active', 'theme') .'" />
+                        <img alt="" src="'. $this->pix_url('fp/view_tree_active', 'theme') .'" class="icon"/>
                     </a>
                 </div>
                 <div class="fp-clear-left"></div>
