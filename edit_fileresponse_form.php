@@ -17,8 +17,7 @@
 /**
  * Defines the editing form for the fileresponse question type.
  *
- * @package    qtype
- * @subpackage fileresponse
+ * @package    qtype_fileresponse
  * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,41 +27,61 @@ defined('MOODLE_INTERNAL') || die();
 
 
 /**
- * Essay question type editing form.
+ * Fileresponse question type editing form.
  *
  * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_fileresponse_edit_form extends question_edit_form {
 
+
     protected function definition_inner($mform) {
         $qtype = question_bank::get_qtype('fileresponse');
 
-        /* display ?forcedownload=1 advice */
+        /* Display the ?forcedownload=1 advice. */
         $mform->addElement('static','advice', get_string('advice', 'qtype_fileresponse'),'<div style="width:496px;">'.get_string('questiontextforcedownload', 'qtype_fileresponse').'</div>');
-        
-        /* fileresponse only accepts 'formatplain' as format */
+
+        /* Fileresponse only accepts 'plain' as format */
         $mform->setDefault('responseformat', 'plain');
 
-        /* fileresponse has to have at least one file required */
-        $mform->addElement('select', 'attachments',
-                get_string('amountofexpectedfiles', 'qtype_fileresponse'), $qtype->attachment_options());
-        $mform->setDefault('attachments', 1);
+        $mform->addElement('header', 'responseoptions', get_string('responseoptions', 'qtype_fileresponse'));
+        $mform->setExpanded('responseoptions');
+
+        /* Response format element removed from qtype_essay. */
+
+        /* Response required element removed from qtype_essay. */
 
         $mform->addElement('select', 'responsefieldlines',
-                get_string('responsefieldlines', 'qtype_fileresponse'), $qtype->response_sizes());
+            get_string('responsefieldlines', 'qtype_fileresponse'), $qtype->response_sizes());
         $mform->setDefault('responsefieldlines', 15);
 
+        /* Fileresponse has to have at least one file required */
+        $mform->addElement('select', 'attachments',
+            get_string('amountofexpectedfiles', 'qtype_fileresponse'), $qtype->attachment_options());
+        $mform->setDefault('attachments', 1);
+
+        /* Attachment required element removed from qtype_essay. */
+
+        $mform->addElement('filetypes', 'filetypeslist', get_string('acceptedfiletypes', 'qtype_fileresponse'));
+        $mform->addHelpButton('filetypeslist', 'acceptedfiletypes', 'qtype_fileresponse');
+        $mform->disabledIf('filetypeslist', 'attachments', 'eq', 0);
+
+        /* The element to allow or disallow repositories. */
         $mform->addElement('select', 'forcedownload',
-                get_string('forcedownload', 'qtype_fileresponse'), $qtype->forcedownload_options());
+            get_string('forcedownload', 'qtype_fileresponse'), $qtype->forcedownload_options());
         $mform->setDefault('forcedownload', 0);
 
+        /* The element to allow or disallow repositories. */
         $mform->addElement('select', 'allowpickerplugins',
-                get_string('allowpickerplugins', 'qtype_fileresponse'), $qtype->allowpickerplugins_options());
+            get_string('allowpickerplugins', 'qtype_fileresponse'), $qtype->allowpickerplugins_options());
         $mform->setDefault('allowpickerplugins', 0);
 
+        /* Response template element removed from qtype_essay. */
+
+        $mform->addElement('header', 'graderinfoheader', get_string('graderinfoheader', 'qtype_fileresponse'));
+        $mform->setExpanded('graderinfoheader');
         $mform->addElement('editor', 'graderinfo', get_string('graderinfo', 'qtype_fileresponse'),
-                array('rows' => 10), $this->editoroptions);
+            array('rows' => 10), $this->editoroptions);
     }
 
     protected function data_preprocessing($question) {
@@ -72,10 +91,13 @@ class qtype_fileresponse_edit_form extends question_edit_form {
             return $question;
         }
 
-        /* fileresponse only accepts 'formatplain' as format */
+        /* Fileresponse only accepts format 'plain' as format. */
         $question->responseformat = 'plain';
+        $question->responserequired = $question->options->responserequired;
         $question->responsefieldlines = $question->options->responsefieldlines;
         $question->attachments = $question->options->attachments;
+        $question->attachmentsrequired = $question->options->attachmentsrequired;
+        $question->filetypeslist = $question->options->filetypeslist;
         $question->forcedownload = $question->options->forcedownload;
         $question->allowpickerplugins = $question->options->allowpickerplugins;
 
@@ -93,13 +115,25 @@ class qtype_fileresponse_edit_form extends question_edit_form {
         $question->graderinfo['format'] = $question->options->graderinfoformat;
         $question->graderinfo['itemid'] = $draftid;
 
-        /* fileresponse doesn't display a response template */
+        /* Fileresponse doesn't display a response template. */
         $question->responsetemplate = array(
             'text' => '',
             'format' => FORMAT_HTML,
         );
 
         return $question;
+    }
+
+    public function validation($fromform, $files) {
+        $errors = parent::validation($fromform, $files);
+
+        // Don't allow the teacher to require more attachments than they allow; as this would
+        // create a condition that it's impossible for the student to meet.
+        if ($fromform['attachments'] != -1 && $fromform['attachments'] < $fromform['attachmentsrequired'] ) {
+            $errors['attachmentsrequired']  = get_string('mustrequirefewer', 'qtype_fileresponse');
+        }
+
+        return $errors;
     }
 
     public function qtype() {

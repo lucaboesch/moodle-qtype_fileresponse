@@ -17,14 +17,15 @@
 /**
  * Version information for the fileresponse question type.
  *
- * @package qtype
- * @subpackage fileresponse
- * @copyright 2012 Luca Bösch luca.boesch@bfh.ch
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    qtype_fileresponse
+ * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'qtype_fileresponse';
-$plugin->version = 2017052600;
+$plugin->version = 2019120200;
 $plugin->requires = 2016120502; // moodle 3.2.x
-$plugin->maturity = MATURITY_BETA;
+$plugin->cron      = 0;
+$plugin->component = 'qtype_fileresponse';
+$plugin->maturity = MATURITY_STABLE;
+$plugin->release   = 'v3.6-r1';

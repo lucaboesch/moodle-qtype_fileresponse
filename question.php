@@ -17,8 +17,7 @@
 /**
  * File response question definition class.
  *
- * @package    qtype
- * @subpackage fileresponse
+ * @package    qtype_fileresponse
  * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,23 +25,40 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/question/type/questionbase.php');
 
 /**
- * Represents an fileresponse question.
+ * Represents a fileresponse question.
  *
  * @copyright  2009 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_fileresponse_question extends question_with_responses {
+
     public $responseformat;
+
+    /** @var int Indicates whether an inline response is required ('0') or optional ('1')  */
+    public $responserequired;
+
     public $responsefieldlines;
     public $attachments;
+
+    /** @var int The number of attachments required for a response to be complete. */
+    public $attachmentsrequired;
+
+    /** @var int Whether to add ?forcedownload=1 to file links. */
     public $forcedownload;
+
+    /** @var int Whether to allow file picker repositories. */
     public $allowpickerplugins;
+
     public $graderinfo;
     public $graderinfoformat;
     public $responsetemplate;
     public $responsetemplateformat;
+
+    /** @var array The string array of file types accepted upon file submission. */
+    public $filetypeslist;
 
     public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
         return question_engine::make_behaviour('manualgraded', $qa, $preferredbehaviour);
@@ -57,13 +73,12 @@ class qtype_fileresponse_question extends question_with_responses {
     }
 
     public function get_expected_data() {
-        /* fileresponse only accepts 'formatplain' as format */
         if ($this->responseformat == 'editorfilepicker') {
-            $expecteddata = array('answer' => question_attempt::PARAM_CLEANHTML_FILES);
+            $expecteddata = array('answer' => question_attempt::PARAM_RAW_FILES);
         } else {
-            $expecteddata = array('answer' => PARAM_CLEANHTML);
+            $expecteddata = array('answer' => PARAM_RAW);
         }
-        $expecteddata['answerformat'] = PARAM_FORMAT;
+        $expecteddata['answerformat'] = PARAM_ALPHANUMEXT;
         if ($this->attachments != 0) {
             $expecteddata['attachments'] = question_attempt::PARAM_FILES;
         }
@@ -71,13 +86,19 @@ class qtype_fileresponse_question extends question_with_responses {
     }
 
     public function summarise_response(array $response) {
-        /* It would be nice to have the answer text but a list of the files' uploaded names as well */
         if (isset($response['answer'])) {
-            $formatoptions = new stdClass();
-            $formatoptions->para = false;
-            return html_to_text(format_text($response['answer'], FORMAT_HTML, $formatoptions), 0, false);
+            /* Return a list of the files' uploaded names. */
+            return html_to_text(format_text($response['answer'], FORMAT_HTML, array('para' => false)), 0, false);
         } else {
             return null;
+        }
+    }
+
+    public function un_summarise_response(string $summary) {
+        if (!empty($summary)) {
+            return ['answer' => text_to_html($summary)];
+        } else {
+            return [];
         }
     }
 
@@ -86,17 +107,67 @@ class qtype_fileresponse_question extends question_with_responses {
     }
 
     public function is_complete_response(array $response) {
-        /* fileresponse question type is always complete (i.e. ready for grading) */
-        /* always returns true, since from this point, there is no possibility though to the question_attempt_step and its fileuploader */
-        return true;
+        // Determine if the given response has online text and attachments.
+        $hasinlinetext = array_key_exists('answer', $response) && ($response['answer'] !== '');
+        $hasattachments = array_key_exists('attachments', $response)
+            && $response['attachments'] instanceof question_response_files;
+
+        // Determine the number of attachments present.
+        if ($hasattachments) {
+            // Check the filetypes.
+            $filetypesutil = new \core_form\filetypes_util();
+            $whitelist = $filetypesutil->normalize_file_types($this->filetypeslist);
+            $wrongfiles = array();
+            foreach ($response['attachments']->get_files() as $file) {
+                if (!$filetypesutil->is_allowed_file_type($file->get_filename(), $whitelist)) {
+                    $wrongfiles[] = $file->get_filename();
+                }
+            }
+            if ($wrongfiles) { // At least one filetype is wrong.
+                return false;
+            }
+            $attachcount = count($response['attachments']->get_files());
+        } else {
+            $attachcount = 0;
+        }
+
+        // Determine if we have /some/ content to be graded.
+        $hascontent = $hasinlinetext || ($attachcount > 0);
+
+        // Determine if we meet the optional requirements.
+        $meetsinlinereq = $hasinlinetext || (!$this->responserequired) || ($this->responseformat == 'noinline');
+        $meetsattachmentreq = ($attachcount >= $this->attachmentsrequired);
+
+        // The response is complete iff all of our requirements are met.
+        return $hascontent && $meetsinlinereq && $meetsattachmentreq;
+    }
+
+    public function is_gradable_response(array $response) {
+        // Determine if the given response has online text and attachments.
+        if (array_key_exists('answer', $response) && ($response['answer'] !== '')) {
+            return true;
+        } else if (array_key_exists('attachments', $response)
+            && $response['attachments'] instanceof question_response_files) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function is_same_response(array $prevresponse, array $newresponse) {
-    /* fileresponse question responses are never the same */
-    /* should return true when there is an answer, and the same answer in the comment field (or both answers are empty and the uploaded files are identical */
-    /* always returns false, since from this point, there is no possibility though to the question_attempt_step and its fileuploader */
-       return false;
-
+        if (array_key_exists('answer', $prevresponse) && $prevresponse['answer'] !== $this->responsetemplate) {
+            $value1 = (string) $prevresponse['answer'];
+        } else {
+            $value1 = '';
+        }
+        if (array_key_exists('answer', $newresponse) && $newresponse['answer'] !== $this->responsetemplate) {
+            $value2 = (string) $newresponse['answer'];
+        } else {
+            $value2 = '';
+        }
+        return $value1 === $value2 && ($this->attachments == 0 ||
+                question_utils::arrays_same_at_key_missing_is_blank(
+                    $prevresponse, $newresponse, 'attachments'));
     }
 
     public function check_file_access($qa, $options, $component, $filearea, $args, $forcedownload) {
@@ -109,14 +180,11 @@ class qtype_fileresponse_question extends question_with_responses {
             return $this->responseformat === 'editorfilepicker';
 
         } else if ($component == 'qtype_fileresponse' && $filearea == 'graderinfo') {
-            return $options->manualcomment;
+            return $options->manualcomment && $args[0] == $this->id;
 
         } else {
             return parent::check_file_access($qa, $options, $component,
-                    $filearea, $args, $forcedownload);
+                $filearea, $args, $forcedownload);
         }
-    }
-    public function classify_response(array $response) {
-        return array();
     }
 }

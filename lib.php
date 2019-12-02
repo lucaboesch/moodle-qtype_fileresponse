@@ -17,9 +17,7 @@
 /**
  * Serve question type files
  *
- * @since      2.0
- * @package    qtype
- * @subpackage fileresponse
+ * @package    qtype_fileresponse
  * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Checks file access for fileresponse questions.
  *
- * @package qtype_fileresponse
+ * @package  qtype_fileresponse
  * @category files
  * @param stdClass $course course object
  * @param stdClass $cm course module object
@@ -42,8 +40,8 @@ defined('MOODLE_INTERNAL') || die();
  * @param array $options additional options affecting the file serving
  * @return bool
  */
-function qtype_fileresponse_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, $allowpickerplugins) {
+function qtype_fileresponse_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $CFG;
     require_once($CFG->libdir . '/questionlib.php');
-    question_pluginfile($course, $context, 'qtype_fileresponse', $filearea, $args, $forcedownload, $allowpickerplugins);
+    question_pluginfile($course, $context, 'qtype_fileresponse', $filearea, $args, $forcedownload, $options);
 }

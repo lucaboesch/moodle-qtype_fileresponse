@@ -1051,7 +1051,20 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
                 }
             }
             return false;
-        }
+        },
+        get_preference: function(name) {
+            if (this.userprefs[name]) {
+                return this.userprefs[name];
+            } else {
+                return false;
+            }
+        },
+        set_preference: function(name, value) {
+            if (this.userprefs[name] != value) {
+                M.util.set_user_preference('fileresponsefilemanager_' + name, value);
+                this.userprefs[name] = value;
+            }
+        },
     });
 
     // finally init everything needed

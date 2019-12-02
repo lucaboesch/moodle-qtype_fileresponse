@@ -15,11 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for the essay question definition class.
+ * Unit tests for the fileresponse question definition class.
  *
- * @package    qtype
- * @subpackage essay
- * @copyright  2009 The Open University
+ * @package    qtype_fileresponse
+ * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

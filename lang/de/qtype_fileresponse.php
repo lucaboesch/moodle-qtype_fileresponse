@@ -17,8 +17,7 @@
 /**
  * Strings for component 'qtype_fileresponse', language 'en', branch 'MOODLE_20_STABLE'
  *
- * @package    qtype
- * @subpackage fileresponse
+ * @package    qtype_fileresponse
  * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

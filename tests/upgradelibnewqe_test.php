@@ -16,11 +16,10 @@
 
 /**
  * Tests of the upgrade to the new Moodle question engine for attempts at
- * essay questions.
+ * fileresponse questions.
  *
- * @package    qtype
- * @subpackage essay
- * @copyright  2009 The Open University
+ * @package    qtype_fileresponse
+ * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

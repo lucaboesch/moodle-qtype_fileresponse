@@ -19,10 +19,9 @@
  *
  * Contains HTML class for a fileresponse simplified filemanager form element
  *
- * @package qtype
- * @subpackage fileresponse
- * @copyright 2012 Luca Bösch luca.boesch@bfh.ch
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    qtype_fileresponse
+ * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 global $CFG;
 

@@ -19,27 +19,26 @@
  *
  * Contains HTML class for a fileresponsefilemanager form element
  *
- * @package core_form
+ * @package   core_form
  * @copyright 2009 Dongsheng Cai <dongsheng@moodle.com>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 global $CFG;
 
-require_once ('HTML/QuickForm/element.php');
-require_once ($CFG->dirroot . '/lib/filelib.php');
-require_once ($CFG->dirroot . '/repository/lib.php');
-require_once ($CFG->dirroot . '/lib/form/templatable_form_element.php');
+require_once('HTML/QuickForm/element.php');
+require_once($CFG->dirroot.'/lib/filelib.php');
+require_once($CFG->dirroot.'/repository/lib.php');
+require_once($CFG->dirroot.'/lib/form/templatable_form_element.php');
 
 
 /**
  * Filemanager form element
  *
  * FilemaneManager lets user to upload/manage multiple files
- *
- * @package core_form
- * @category form
+ * @package   core_form
+ * @category  form
  * @copyright 2009 Dongsheng Cai <dongsheng@moodle.com>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element implements templatable {
     use templatable_form_element {
@@ -53,10 +52,8 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
     // PHP doesn't support 'key' => $value1 | $value2 in class definition
     // We cannot do $_options = array('return_types'=> FILE_INTERNAL | FILE_REFERENCE);
     // So I have to set null here, and do it in constructor
-    protected $_options = array('mainfile' => '', 'subdirs' => 1, 'maxbytes' => -1,
-        'maxfiles' => -1, 'accepted_types' => '*', 'return_types' => null,
-        'areamaxbytes' => FILE_AREA_MAX_BYTES_UNLIMITED
-    );
+    protected $_options = array('mainfile' => '', 'subdirs' => 1, 'maxbytes' => -1, 'maxfiles' => -1,
+        'accepted_types' => '*', 'return_types' =>  null, 'areamaxbytes' => FILE_AREA_MAX_BYTES_UNLIMITED);
 
     /**
      * Constructor
@@ -81,7 +78,7 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
                     $CFG->maxbytes, $options['maxbytes']);
         }
         if (empty($options['return_types'])) {
-            $this->_options['return_types'] = (FILE_INTERNAL | FILE_REFERENCE);
+            $this->_options['return_types'] = (FILE_INTERNAL | FILE_REFERENCE | FILE_CONTROLLED_LINK);
         }
         $this->_type = 'fileresponsefilemanager';
         parent::__construct($elementName, $elementLabel, $attributes);
@@ -312,6 +309,14 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
                 array('value' => '', 'id' => 'id_' . $elname, 'type' => 'hidden'
                 ));
 
+        if (!empty($options->accepted_types) && $options->accepted_types != '*') {
+            $html .= html_writer::tag('p', get_string('filesofthesetypes', 'form'));
+            $util = new \core_form\filetypes_util();
+            $filetypes = $options->accepted_types;
+            $filetypedescriptions = $util->describe_file_types($filetypes);
+            $html .= $OUTPUT->render_from_template('core_form/filetypes-descriptions', $filetypedescriptions);
+        }
+
         return $html;
     }
 
@@ -319,6 +324,51 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
         $context = $this->export_for_template_base($output);
         $context['html'] = $this->toHtml();
         return $context;
+    }
+
+    /**
+     * Check that all files have the allowed type.
+     *
+     * @param int $value Draft item id with the uploaded files.
+     * @return string|null Validation error message or null.
+     */
+    public function validateSubmitValue($value) {
+
+        if (empty($value)) {
+            return;
+        }
+
+        $filetypesutil = new \core_form\filetypes_util();
+        $whitelist = $filetypesutil->normalize_file_types($this->_options['accepted_types']);
+
+        if (empty($whitelist) || $whitelist === ['*']) {
+            // Any file type is allowed, nothing to check here.
+            return;
+        }
+
+        $draftfiles = file_get_all_files_in_draftarea($value);
+        $wrongfiles = array();
+
+        if (empty($draftfiles)) {
+            // No file uploaded, nothing to check here.
+            return;
+        }
+
+        foreach ($draftfiles as $file) {
+            if (!$filetypesutil->is_allowed_file_type($file->filename, $whitelist)) {
+                $wrongfiles[] = $file->filename;
+            }
+        }
+
+        if ($wrongfiles) {
+            $a = array(
+                'whitelist' => implode(', ', $whitelist),
+                'wrongfiles' => implode(', ', $wrongfiles),
+            );
+            return get_string('err_wrongfileextension', 'core_form', $a);
+        }
+
+        return;
     }
 }
 
@@ -460,6 +510,7 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
 
     /**
      * Prints the file manager and initializes all necessary libraries
+     * This is mainly taken from files/renderer.php.
      *
      * <pre>
      * $fm = new form_fileresponsefilemanager($options);
@@ -499,17 +550,14 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
         if (empty($fileresponsefilemanagertemplateloaded)) {
             $fileresponsefilemanagertemplateloaded = true;
             $this->page->requires->js_init_call('M.form_fileresponsefilemanager.set_templates',
-                    array($this->fileresponsefilemanager_js_templates()
-                    ), true, $module);
+                array($this->fileresponsefilemanager_js_templates()), true, $module);
         }
-        $this->page->requires->js_init_call('M.form_fileresponsefilemanager.init',
-                array($fm->options
-                ), true, $module);
+        $this->page->requires->js_init_call('M.form_fileresponsefilemanager.init', array($fm->options), true, $module);
 
         // non javascript file manager
         $html .= '<noscript>';
         $html .= "<div><object type='text/html' data='" . $fm->get_nonjsurl() .
-                 "' height='160' width='600' style='border:1px solid #000'></object></div>";
+            "' height='160' width='600' style='border:1px solid #000'></object></div>";
         $html .= '</noscript>';
 
         return $html;
@@ -595,51 +643,36 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
 <div class="fp-navbar">
     <div class="filemanager-toolbar">
         <div class="fp-toolbar">
-            <div class="fp-btn-add">
-                <a role="button" title="' . $straddfile .
-                 '" href="#">
-                    <img src="' .
-                 $this->image_url('a/add_file') . '" alt="' . $straddfiletext . '" />
+                <div class="fp-btn-add">
+                    <a role="button" title="' . $straddfile . '" href="#">
+                        ' . $this->pix_icon('a/add_file', $straddfiletext) . '
+                    </a>
+                </div>
+                <div class="fp-btn-mkdir">
+                    <a role="button" title="' . $strmakedir . '" href="#">
+                        ' . $this->pix_icon('a/create_folder', $strcreatefolder) . '
+                    </a>
+                </div>
+                <div class="fp-btn-download">
+                    <a role="button" title="' . $strdownload . '" href="#">
+                        ' . $this->pix_icon('a/download_all', $strdownloadallfiles) . '
+                    </a>
+                </div>
+                <span class="fp-img-downloading">
+                    ' . $this->pix_icon('i/loading_small', '') . '
+                </span>
+            </div>
+            <div class="fp-viewbar">
+                <a title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons" href="#">
+                    ' . $this->pix_icon('fp/view_icon_active', get_string('displayasicons', 'repository'), 'theme') . '
+                </a>
+                <a title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details" href="#">
+                    ' . $this->pix_icon('fp/view_list_active', get_string('displayasdetails', 'repository'), 'theme') . '
+                </a>
+                <a title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree" href="#">
+                    ' . $this->pix_icon('fp/view_tree_active', get_string('displayastree', 'repository'), 'theme') . '
                 </a>
             </div>
-            <div class="fp-btn-mkdir">
-                <a role="button" title="' . $strmakedir .
-                 '" href="#">
-                    <img src="' .
-                 $this->image_url('a/create_folder') . '" alt="' . $strcreatefolder . '" />
-                </a>
-            </div>
-            <div class="fp-btn-download">
-                <a role="button" title="' . $strdownload . '" href="#">
-                    <img src="' .
-                 $this->image_url('a/download_all') . '" alt="' . $strdownloadallfiles .
-                 '" />
-                </a>
-            </div>
-            <img class="fp-img-downloading" src="' .
-                 $this->image_url('i/loading_small') .
-                 '" alt="" />
-        </div>
-        <div class="fp-viewbar">
-            <a title="' .
-                 get_string('displayicons', 'repository') . '" class="fp-vb-icons" href="#">
-                <img alt="' .
-                 get_string('displayasicons', 'repository') . '" src="' .
-                 $this->image_url('fp/view_icon_active', 'theme') .
-                 '" class="icon"/>
-            </a>
-            <a title="' .
-                 get_string('displaydetails', 'repository') . '" class="fp-vb-details" href="#">
-                <img alt="' .
-                 get_string('displayasdetails', 'repository') . '" src="' .
-                 $this->image_url('fp/view_list_active', 'theme') . '" class="icon"/>
-            </a>
-            <a title="' .
-                 get_string('displaytree', 'repository') . '" class="fp-vb-tree" href="#">
-                <img alt="' .
-                 get_string('displayastree', 'repository') . '" src="' .
-                 $this->image_url('fp/view_tree_active', 'theme') . '" class="icon"/>
-            </a>
         </div>
     </div>
     <div class="fp-pathbar">
@@ -816,10 +849,10 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
         $iconprogress = $this->pix_icon('i/loading_small', $strloading) . '';
         $rv = '
 <div class="filemanager fp-select">
-<div class="fp-select-loading">
-    <img src="' . $this->image_url('i/loading_small') . '" />
-</div>
-<form class="form-horizontal">
+    <div class="fp-select-loading">
+        ' . $this->pix_icon('i/loading_small', '') . '
+    </div>
+    <form class="form-horizontal">
     <button class="fp-file-download">' . get_string('download') . '</button>
     <button class="fp-file-delete">' . get_string('delete') . '</button>
     <button class="fp-file-setmain">' .
@@ -1047,28 +1080,28 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
                     <a title="' .
                  get_string('refresh', 'repository') . '" href="#">
                         <img alt=""  src="' .
-                 $this->image_url('a/refresh') . '" />
+                 $this->pix_icon('a/refresh') . '" />
                     </a>
                 </div>
                 <div class="fp-tb-logout">
                     <a title="' .
                  get_string('logout', 'repository') . '" href="#">
                         <img alt="" src="' .
-                 $this->image_url('a/logout') . '" />
+                 $this->pix_icon('a/logout') . '" />
                     </a>
                 </div>
                 <div class="fp-tb-manage">
                     <a title="' .
                  get_string('settings', 'repository') . '" href="#">
                         <img alt="" src="' .
-                 $this->image_url('a/setting') . '" />
+                 $this->pix_icon('a/setting') . '" />
                     </a>
                 </div>
                 <div class="fp-tb-help">
                     <a title="' .
                  get_string('help', 'repository') . '" href="#">
                         <img alt="" src="' .
-                 $this->image_url('a/help') .
+                 $this->pix_icon('a/help') .
                  '" />
                     </a>
                 </div>
@@ -1078,19 +1111,19 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
                 <a role="button" title="' .
                  get_string('displayicons', 'repository') . '" class="fp-vb-icons" href="#">
                     <img alt="" src="' .
-                 $this->image_url('fp/view_icon_active', 'theme') .
+                 $this->pix_icon('fp/view_icon_active', 'theme') .
                  '" class="icon"/>
                 </a>
                 <a role="button" title="' .
                  get_string('displaydetails', 'repository') . '" class="fp-vb-details" href="#">
                     <img alt="" src="' .
-                 $this->image_url('fp/view_list_active', 'theme') .
+                 $this->pix_icon('fp/view_list_active', 'theme') .
                  '" class="icon"/>
                 </a>
                 <a role="button" title="' .
                  get_string('displaytree', 'repository') . '" class="fp-vb-tree" href="#">
                     <img alt="" src="' .
-                 $this->image_url('fp/view_tree_active', 'theme') . '" class="icon"/>
+                 $this->pix_icon('fp/view_tree_active', 'theme') . '" class="icon"/>
                 </a>
             </div>
             <div class="fp-clear-left"></div>
@@ -1182,7 +1215,7 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
 <div class="fp-nextpage">
 <div class="fp-nextpage-link"><a href="#">' . get_string('more') . '</a></div>
 <div class="fp-nextpage-loading">
-    <img src="' . $this->image_url('i/loading_small') . '" />
+    <img src="' . $this->pix_icon('i/loading_small') . '" />
 </div>
 </div>';
         return $rv;
@@ -1220,7 +1253,7 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
         $rv = '
 <div class="file-picker fp-select">
 <div class="fp-select-loading">
-    <img src="' . $this->image_url('i/loading_small') . '" />
+    <img src="' . $this->pix_icon('i/loading_small') . '" />
 </div>
 <form class="form-horizontal">
     <div class="fp-forminset">
@@ -1379,7 +1412,7 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
         return '
 <div class="fp-content-loading">
 <div class="fp-content-center">
-    <img src="' . $this->image_url('i/loading_small') . '" />
+    <img src="' . $this->pix_icon('i/loading_small') . '" />
 </div>
 </div>';
     }
