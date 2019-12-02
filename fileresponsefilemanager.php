@@ -23,6 +23,7 @@
  * @copyright 2009 Dongsheng Cai <dongsheng@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 global $CFG;
 
 require_once('HTML/QuickForm/element.php');
@@ -53,7 +54,7 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
     // We cannot do $_options = array('return_types'=> FILE_INTERNAL | FILE_REFERENCE);
     // So I have to set null here, and do it in constructor
     protected $_options = array('mainfile' => '', 'subdirs' => 1, 'maxbytes' => -1, 'maxfiles' => -1,
-        'accepted_types' => '*', 'return_types' =>  null, 'areamaxbytes' => FILE_AREA_MAX_BYTES_UNLIMITED);
+            'accepted_types' => '*', 'return_types' =>  null, 'areamaxbytes' => FILE_AREA_MAX_BYTES_UNLIMITED);
 
     /**
      * Constructor
@@ -61,7 +62,7 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
      * @param string $elementName (optional) name of the fileresponsefilemanager
      * @param string $elementLabel (optional) fileresponsefilemanager label
      * @param array $attributes (optional) Either a typical HTML attribute string
-     *        or an associative array
+     *              or an associative array
      * @param array $options set of options to initalize fileresponsefilemanager
      */
     public function __construct($elementName = null, $elementLabel = null, $attributes = null, $options = null) {
@@ -464,6 +465,10 @@ class form_fileresponsefilemanager implements renderable {
         $this->options->maxbytes = get_user_max_upload_file_size($context, $CFG->maxbytes,
                 $coursebytes, $maxbytes);
 
+        $this->options->userprefs = array();
+        $this->options->userprefs['recentviewmode'] = get_user_preferences('filemanager_recentviewmode', '');
+        user_preference_allow_ajax_update('filemanager_recentviewmode', PARAM_INT);
+
         // building file picker options
         $params = new stdClass();
         $params->accepted_types = $options->accepted_types;
@@ -523,45 +528,34 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
      */
     public function render_form_fileresponsefilemanager($fm) {
         $html = $this->fm_print_generallayout($fm);
-        $module = array('name' => 'form_fileresponsefilemanager',
-            'fullpath' => '/question/type/fileresponse/fileresponsefilemanager.js',
-            'requires' => array('moodle-core-notification-dialogue', 'core_filepicker', 'base',
-                'io-base', 'node', 'json', 'core_dndupload', 'panel', 'resize-plugin', 'dd-plugin'
-            ),
-            'strings' => array(array('error', 'moodle'
-            ), array('info', 'moodle'
-            ), array('confirmdeletefile', 'repository'
-            ), array('draftareanofiles', 'repository'
-            ), array('entername', 'repository'
-            ), array('enternewname', 'repository'
-            ), array('invalidjson', 'repository'
-            ), array('popupblockeddownload', 'repository'
-            ), array('unknownoriginal', 'repository'
-            ), array('confirmdeletefolder', 'repository'
-            ), array('confirmdeletefilewithhref', 'repository'
-            ), array('confirmrenamefolder', 'repository'
-            ), array('confirmrenamefile', 'repository'
-            ), array('newfolder', 'repository'
-            ), array('edit', 'moodle'
-            )
+        $module = array(
+            'name'=>'form_fileresponsefilemanager',
+            'fullpath'=>'/question/type/fileresponse/fileresponsefilemanager.js',
+            'requires' => array('moodle-core-notification-dialogue', 'core_filepicker', 'base', 'io-base', 'node', 'json', 'core_dndupload', 'panel', 'resize-plugin', 'dd-plugin'),
+            'strings' => array(
+                array('error', 'moodle'), array('info', 'moodle'), array('confirmdeletefile', 'repository'),
+                array('draftareanofiles', 'repository'), array('entername', 'repository'), array('enternewname', 'repository'),
+                array('invalidjson', 'repository'), array('popupblockeddownload', 'repository'),
+                array('unknownoriginal', 'repository'), array('confirmdeletefolder', 'repository'),
+                array('confirmdeletefilewithhref', 'repository'), array('confirmrenamefolder', 'repository'),
+                array('confirmrenamefile', 'repository'), array('newfolder', 'repository'), array('edit', 'moodle')
             )
         );
-
-        if (empty($fileresponsefilemanagertemplateloaded)) {
-            $fileresponsefilemanagertemplateloaded = true;
+        if ($this->page->requires->should_create_one_time_item_now('core_file_managertemplate')) {
             $this->page->requires->js_init_call('M.form_fileresponsefilemanager.set_templates',
-                array($this->fileresponsefilemanager_js_templates()), true, $module);
+                    array($this->fileresponsefilemanager_js_templates()), true, $module);
         }
         $this->page->requires->js_init_call('M.form_fileresponsefilemanager.init', array($fm->options), true, $module);
 
         // non javascript file manager
         $html .= '<noscript>';
-        $html .= "<div><object type='text/html' data='" . $fm->get_nonjsurl() .
-            "' height='160' width='600' style='border:1px solid #000'></object></div>";
+        $html .= "<div><object type='text/html' data='".$fm->get_nonjsurl()."' height='160' width='600' style='border:1px solid #000'></object></div>";
         $html .= '</noscript>';
+
 
         return $html;
     }
+
 
     /**
      * Returns html for displaying one file manager
@@ -634,27 +628,27 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
         $strdownloadallfiles = get_string('downloadallfiles', 'repository');
 
         $html = '
-<div id="fileresponsefilemanager-' . $client_id . '" class="filemanager fm-loading">
+<div id="filemanager-' . $client_id . '" class="filemanager w-100 fm-loading">
 <div class="fp-restrictions">
     ' . $restrictions . '
     <span class="dnduploadnotsupported-message"> - ' .
                  $strdndnotsupported . ' </span>
 </div>
-<div class="fp-navbar">
-    <div class="filemanager-toolbar">
+<div class="fp-navbar bg-faded card mb-0">
+    <div class="filemanager-toolbar icon-no-spacing">
         <div class="fp-toolbar">
                 <div class="fp-btn-add">
-                    <a role="button" title="' . $straddfile . '" href="#">
+                    <a role="button" title="' . $straddfile . '" class="btn btn-secondary btn-sm" href="#">
                         ' . $this->pix_icon('a/add_file', $straddfiletext) . '
                     </a>
                 </div>
                 <div class="fp-btn-mkdir">
-                    <a role="button" title="' . $strmakedir . '" href="#">
+                    <a role="button" title="' . $strmakedir . '" class="btn btn-secondary btn-sm" href="#">
                         ' . $this->pix_icon('a/create_folder', $strcreatefolder) . '
                     </a>
                 </div>
                 <div class="fp-btn-download">
-                    <a role="button" title="' . $strdownload . '" href="#">
+                    <a role="button" title="' . $strdownload . '" class="btn btn-secondary btn-sm" href="#">
                         ' . $this->pix_icon('a/download_all', $strdownloadallfiles) . '
                     </a>
                 </div>
@@ -662,14 +656,14 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
                     ' . $this->pix_icon('i/loading_small', '') . '
                 </span>
             </div>
-            <div class="fp-viewbar">
-                <a title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons" href="#">
+            <div class="fp-viewbar btn-group float-sm-right">
+                <a title="'. get_string('displayicons', 'repository') .'" class="fp-vb-icons btn btn-secondary btn-sm" href="#">
                     ' . $this->pix_icon('fp/view_icon_active', get_string('displayasicons', 'repository'), 'theme') . '
                 </a>
-                <a title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details" href="#">
+                <a title="'. get_string('displaydetails', 'repository') .'" class="fp-vb-details btn btn-secondary btn-sm" href="#">
                     ' . $this->pix_icon('fp/view_list_active', get_string('displayasdetails', 'repository'), 'theme') . '
                 </a>
-                <a title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree" href="#">
+                <a title="'. get_string('displaytree', 'repository') .'" class="fp-vb-tree btn btn-secondary btn-sm" href="#">
                     ' . $this->pix_icon('fp/view_tree_active', get_string('displayastree', 'repository'), 'theme') . '
                 </a>
             </div>
@@ -680,8 +674,8 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
     </div>
 </div>
 <div class="filemanager-loading mdl-align">' . $icon_progress .
-                 '</div>
-<div class="filemanager-container" >
+                 '<span class="sr-only">' . get_string('loadinghelp') . '</span></div>
+<div class="filemanager-container card" >
     <div class="fm-content-wrapper">
         <div class="fp-content"></div>
         <div class="fm-empty-container">
@@ -692,9 +686,9 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
         <div class="dndupload-target">' .
                  $strdroptoupload . '<br/><div class="dndupload-arrow"></div></div>
         <div class="dndupload-progressbars"></div>
-        <div class="dndupload-uploadinprogress">' . $icon_progress . '</div>
+        <div class="dndupload-uploadinprogress">' . $icon_progress . '<span class="sr-only">' . get_string('loadinghelp') . '</span></div>
     </div>
-    <div class="filemanager-updating">' . $icon_progress . '</div>
+    <div class="filemanager-updating">' . $icon_progress . '<span class="sr-only">' . get_string('loadinghelp') . '</span></div>
 </div>
 </div>';
         return $html;
@@ -979,7 +973,7 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
         $templates = array();
         foreach ($class_methods as $method_name) {
             if (preg_match('/^fm_js_template_(.*)$/', $method_name, $matches))
-                $templates[$matches[1]] = $this->$method_name();
+            $templates[$matches[1]] = $this->$method_name();
         }
         return $templates;
     }
@@ -1411,9 +1405,9 @@ class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_rendere
     protected function fp_js_template_loading() {
         return '
 <div class="fp-content-loading">
-<div class="fp-content-center">
-    <img src="' . $this->pix_icon('i/loading_small') . '" />
-</div>
+    <div class="fp-content-center">
+        ' . $this->pix_icon('i/loading_small', '') . '
+    </div>
 </div>';
     }
 

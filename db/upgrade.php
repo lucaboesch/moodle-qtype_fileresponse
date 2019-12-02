@@ -183,8 +183,20 @@ function xmldb_qtype_fileresponse_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013021700, 'qtype', 'fileresponse');
     }
 
-    // Moodle v2.6.0 release upgrade line.
-    // Put any upgrade step following this.
+    if ($oldversion < 2019120200) {
+
+        // Add "filetypeslist" column to the question type options to save the allowed file types.
+        $table = new xmldb_table('qtype_fileresponse_options');
+        $field = new xmldb_field('filetypeslist', XMLDB_TYPE_TEXT, null, null, null, null, null, 'responsetemplateformat');
+
+        // Conditionally launch add field filetypeslist.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Essay savepoint reached.
+        upgrade_plugin_savepoint(true, 2019120200, 'qtype', 'fileresponse');
+    }
 
     return true;
 }

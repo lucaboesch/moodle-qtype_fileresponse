@@ -123,7 +123,7 @@ class qtype_fileresponse extends question_type {
     }
 
     /**
-     * @return array the choices that should be offerd when asking if a response is required
+     * @return array the choices that should be offered when asking if a response is required
      */
     public function response_required_options() {
         return array(

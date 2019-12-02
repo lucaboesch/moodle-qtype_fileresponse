@@ -48,16 +48,16 @@ M.form_fileresponsesimplifiedfilemanager.set_templates = function(Y, templates) 
  * This fucntion is called for each file picker on page.
  */
 M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
-    var FileResponseSimplifiedFileManagerHelper = function(options) {
-        FileResponseSimplifiedFileManagerHelper.superclass.constructor.apply(this, arguments);
+    var FileManagerHelper = function(options) {
+        FileManagerHelper.superclass.constructor.apply(this, arguments);
     };
-    FileResponseSimplifiedFileManagerHelper.NAME = "fileresponsesimplifiedfilemanager";
-    FileResponseSimplifiedFileManagerHelper.ATTRS = {
+    FileManagerHelper.NAME = "fileresponsesimplifiedfilemanager";
+    FileManagerHelper.ATTRS = {
         options: {},
         lang: {}
     };
 
-    Y.extend(FileResponseSimplifiedFileManagerHelper, Y.Base, {
+    Y.extend(FileManagerHelper, Y.Base, {
         api: M.cfg.wwwroot+'/repository/draftfiles_ajax.php',
         menus: {},
         initializer: function(options) {
@@ -70,6 +70,7 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
             this.maxfiles = options.maxfiles;
             this.maxbytes = options.maxbytes;
             this.areamaxbytes = options.areamaxbytes;
+            this.userprefs = options.userprefs;
             this.emptycallback = null; // Used by drag and drop upload
 
             this.filepicker_options = options.filepicker?options.filepicker:{};
@@ -126,9 +127,13 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
             // set event handler for lazy loading of thumbnails
             this.fileresponsesimplifiedfilemanager.one('.fp-content').on(['scroll','resize'], this.content_scrolled, this);
             // display files
-            this.viewmode = 1; // TODO take from cookies?
-            this.fileresponsesimplifiedfilemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked')
-            this.fileresponsesimplifiedfilemanager.all('.fp-vb-icons').addClass('checked')
+            this.viewmode = this.get_preference("recentviewmode");
+            if (this.viewmode != 2 && this.viewmode != 3) {
+                this.viewmode = 1;
+            }
+            var viewmodeselectors = {'1': '.fp-vb-icons', '2': '.fp-vb-tree', '3': '.fp-vb-details'};
+            this.fileresponsesimplifiedfilemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked');
+            this.fileresponsesimplifiedfilemanager.all(viewmodeselectors[this.viewmode]).addClass('checked');
             this.refresh(this.currentpath); // MDL-31113 get latest list from server
         },
 
@@ -416,6 +421,7 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
                         this.render();
                         this.fileresponsesimplifiedfilemanager.one('.fp-content').setAttribute('tabIndex', '0');
                         this.fileresponsesimplifiedfilemanager.one('.fp-content').focus();
+                        this.set_preference('recentviewmode', this.viewmode);
                     }
                 }, this);
         },
@@ -817,12 +823,10 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
                 e.preventDefault();
                 this.update_file();
             }, this);
-            selectnode.all('form').on('keydown', function(e) {
-                if (e.keyCode == 13) {
-                    e.preventDefault();
-                    this.update_file();
-                }
-            }, this);
+            selectnode.all('form input').on('key', function(e) {
+                e.preventDefault();
+                scope.update_file();
+            }, 'enter');
 
             /* don't download fix */
 /*
@@ -946,6 +950,11 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
                 // TODO if changed asked to confirm, the same with close button
                 this.selectui.hide();
             }, this);
+            selectnode.all('.fp-file-update, .fp-file-download, .fp-file-delete, .fp-file-zip, .fp-file-unzip, ' +
+                '.fp-file-setmain, .fp-file-cancel').on('key', function(e) {
+                e.preventDefault();
+                this.simulate('click');
+            }, 'enter');
         },
         get_parent_folder_name: function(node) {
             if (node.type != 'folder' || node.filepath.length < node.fullname.length+1) {
@@ -1089,16 +1098,28 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
                 }
             }
             return false;
-        }
+        },
+        get_preference: function(name) {
+            if (this.userprefs[name]) {
+                return this.userprefs[name];
+            } else {
+                return false;
+            }
+        },
+        set_preference: function(name, value) {
+            if (this.userprefs[name] != value) {
+                M.util.set_user_preference('filemanager_' + name, value);
+                this.userprefs[name] = value;
+            }
+        },
     });
 
     // finally init everything needed
     // hide loading picture, display fileresponsesimplifiedfilemanager interface
-    var fileresponsesimplifiedfilemanager = Y.one('#fileresponsesimplifiedfilemanager-'+options.client_id);
-    fileresponsesimplifiedfilemanager.removeClass('fm-loading').addClass('fm-loaded');
+    var filemanager = Y.one('#filemanager-'+options.client_id);
+    filemanager.removeClass('fm-loading').addClass('fm-loaded');
 
-    var manager = new FileResponseSimplifiedFileManagerHelper(options);
-    var dndoptions = {
+    var manager = new FileManagerHelper(options);
         filemanager: manager,
         acceptedtypes: options.filepicker.accepted_types,
         clientid: options.client_id,
