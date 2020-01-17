@@ -93,10 +93,8 @@ class qtype_fileresponse_edit_form extends question_edit_form {
 
         /* Fileresponse only accepts format 'plain' as format. */
         $question->responseformat = 'plain';
-        $question->responserequired = $question->options->responserequired;
         $question->responsefieldlines = $question->options->responsefieldlines;
         $question->attachments = $question->options->attachments;
-        $question->attachmentsrequired = $question->options->attachmentsrequired;
         $question->filetypeslist = $question->options->filetypeslist;
         $question->forcedownload = $question->options->forcedownload;
         $question->allowpickerplugins = $question->options->allowpickerplugins;
@@ -129,8 +127,9 @@ class qtype_fileresponse_edit_form extends question_edit_form {
 
         // Don't allow the teacher to require more attachments than they allow; as this would
         // create a condition that it's impossible for the student to meet.
-        if ($fromform['attachments'] != -1 && $fromform['attachments'] < $fromform['attachmentsrequired'] ) {
-            $errors['attachmentsrequired']  = get_string('mustrequirefewer', 'qtype_fileresponse');
+        if ((isset($fromform['attachmentsrequired'])) &&
+            ($fromform['attachments'] != -1 && $fromform['attachments'] < $fromform['attachmentsrequired'])) {
+                $errors['attachmentsrequired']  = get_string('mustrequirefewer', 'qtype_fileresponse');
         }
 
         return $errors;

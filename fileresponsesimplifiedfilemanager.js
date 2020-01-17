@@ -88,18 +88,18 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
                 this.filecount = 0;
             }
             // prepare fileresponsesimplifiedfilemanager for drag-and-drop upload
-            this.fileresponsesimplifiedfilemanager = Y.one('#fileresponsesimplifiedfilemanager-'+options.client_id);
-            if (this.fileresponsesimplifiedfilemanager.hasClass('fileresponsesimplifiedfilemanager-container') || !this.fileresponsesimplifiedfilemanager.one('.fileresponsesimplifiedfilemanager-container')) {
-                this.dndcontainer = this.fileresponsesimplifiedfilemanager;
+            this.filemanager = Y.one('#fileresponsesimplifiedfilemanager-'+options.client_id);
+            if (this.filemanager.hasClass('filemanager-container') || !this.filemanager.one('.filemanager-container')) {
+                this.dndcontainer = this.filemanager;
             } else  {
-                this.dndcontainer = this.fileresponsesimplifiedfilemanager.one('.fileresponsesimplifiedfilemanager-container');
+                this.dndcontainer = this.filemanager.one('.filemanager-container');
                 if (!this.dndcontainer.get('id')) {
                     this.dndcontainer.generateID();
                 }
             }
             // save template for one path element and location of path bar
-            if (this.fileresponsesimplifiedfilemanager.one('.fp-path-folder')) {
-                this.pathnode = this.fileresponsesimplifiedfilemanager.one('.fp-path-folder');
+            if (this.filemanager.one('.fp-path-folder')) {
+                this.pathnode = this.filemanager.one('.fp-path-folder');
                 this.pathbar = this.pathnode.get('parentNode');
                 this.pathbar.removeChild(this.pathnode);
             }
@@ -125,20 +125,20 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
             // setup buttons onclick events
             this.setup_buttons();
             // set event handler for lazy loading of thumbnails
-            this.fileresponsesimplifiedfilemanager.one('.fp-content').on(['scroll','resize'], this.content_scrolled, this);
+            this.filemanager.one('.fp-content').on(['scroll','resize'], this.content_scrolled, this);
             // display files
             this.viewmode = this.get_preference("recentviewmode");
             if (this.viewmode != 2 && this.viewmode != 3) {
                 this.viewmode = 1;
             }
             var viewmodeselectors = {'1': '.fp-vb-icons', '2': '.fp-vb-tree', '3': '.fp-vb-details'};
-            this.fileresponsesimplifiedfilemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked');
-            this.fileresponsesimplifiedfilemanager.all(viewmodeselectors[this.viewmode]).addClass('checked');
+            this.filemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked');
+            this.filemanager.all(viewmodeselectors[this.viewmode]).addClass('checked');
             this.refresh(this.currentpath); // MDL-31113 get latest list from server
         },
 
         wait: function() {
-           this.fileresponsesimplifiedfilemanager.addClass('fm-updating');
+           this.filemanager.addClass('fm-updating');
         },
         request: function(args, redraw) {
             var api = this.api + '?action='+args.action;
@@ -204,15 +204,15 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
         },
         check_buttons: function() {
             if (this.filecount>0) {
-                this.fileresponsesimplifiedfilemanager.removeClass('fm-nofiles');
+                this.filemanager.removeClass('fm-nofiles');
             } else {
-                this.fileresponsesimplifiedfilemanager.addClass('fm-nofiles');
+                this.filemanager.addClass('fm-nofiles');
             }
             if (this.filecount >= this.maxfiles && this.maxfiles!=-1) {
-                this.fileresponsesimplifiedfilemanager.addClass('fm-maxfiles');
+                this.filemanager.addClass('fm-maxfiles');
             }
             else {
-                this.fileresponsesimplifiedfilemanager.removeClass('fm-maxfiles');
+                this.filemanager.removeClass('fm-maxfiles');
             }
         },
         refresh: function(filepath) {
@@ -266,18 +266,18 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
             this.msg_dlg.show();
         },
         is_disabled: function() {
-            return this.fileresponsesimplifiedfilemanager.ancestor('.fitem.disabled') != null;
+            return this.filemanager.ancestor('.fitem.disabled') != null;
         },
         setup_buttons: function() {
           /* don't download fix */
-          //  var button_download = this.fileresponsesimplifiedfilemanager.one('.fp-btn-download');
-            var button_create   = this.fileresponsesimplifiedfilemanager.one('.fp-btn-mkdir');
-            var button_addfile  = this.fileresponsesimplifiedfilemanager.one('.fp-btn-add');
+          //  var button_download = this.filemanager.one('.fp-btn-download');
+            var button_create   = this.filemanager.one('.fp-btn-mkdir');
+            var button_addfile  = this.filemanager.one('.fp-btn-add');
 
             // setup 'add file' button
             button_addfile.on('click', this.show_filepicker, this);
 
-            var dndarrow = this.fileresponsesimplifiedfilemanager.one('.dndupload-arrow');
+            var dndarrow = this.filemanager.one('.dndupload-arrow');
             if (dndarrow) {
                 dndarrow.on('click', this.show_filepicker, this);
             }
@@ -362,7 +362,7 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
                     Y.all('#fm-curpath-'+scope.client_id).setContent(this.currentpath);
                 }, this);
             } else {
-                this.fileresponsesimplifiedfilemanager.addClass('fm-nomkdir');
+                this.filemanager.addClass('fm-nomkdir');
             }
             /* don't download fix */
             /*
@@ -374,7 +374,7 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
                 }
                 var scope = this;
 
-                var image_downloading = this.fileresponsesimplifiedfilemanager.one('.fp-img-downloading');
+                var image_downloading = this.filemanager.one('.fp-img-downloading');
                 if (image_downloading.getStyle('display') == 'inline') {
                     return;
                 }
@@ -385,7 +385,7 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
                     action: 'downloaddir',
                     scope: scope,
                     callback: function(id, obj, args) {
-                        var image_downloading = scope.fileresponsesimplifiedfilemanager.one('.fp-img-downloading');
+                        var image_downloading = scope.filemanager.one('.fp-img-downloading');
                         image_downloading.setStyle('display', 'none');
 
                         if (obj) {
@@ -404,12 +404,12 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
                 });
             }, this);
 */
-            this.fileresponsesimplifiedfilemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').
+            this.filemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').
                 on('click', function(e) {
                     e.preventDefault();
-                    var viewbar = this.fileresponsesimplifiedfilemanager.one('.fp-viewbar')
+                    var viewbar = this.filemanager.one('.fp-viewbar')
                     if (!this.is_disabled() && (!viewbar || !viewbar.hasClass('disabled'))) {
-                        this.fileresponsesimplifiedfilemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked')
+                        this.filemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked')
                         if (e.currentTarget.hasClass('fp-vb-tree')) {
                             this.viewmode = 2;
                         } else if (e.currentTarget.hasClass('fp-vb-details')) {
@@ -419,8 +419,8 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
                         }
                         e.currentTarget.addClass('checked')
                         this.render();
-                        this.fileresponsesimplifiedfilemanager.one('.fp-content').setAttribute('tabIndex', '0');
-                        this.fileresponsesimplifiedfilemanager.one('.fp-content').focus();
+                        this.filemanager.one('.fp-content').setAttribute('tabIndex', '0');
+                        this.filemanager.one('.fp-content').focus();
                         this.set_preference('recentviewmode', this.viewmode);
                     }
                 }, this);
@@ -535,7 +535,7 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
                 if (this.processingimages) {return;}
                 this.processingimages = true;
                 var scope = this,
-                    fpcontent = this.fileresponsesimplifiedfilemanager.one('.fp-content'),
+                    fpcontent = this.filemanager.one('.fp-content'),
                     fpcontenty = fpcontent.getY(),
                     fpcontentheight = fpcontent.getStylePx('height'),
                     is_node_visible = function(node) {
@@ -557,9 +557,9 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
             }, this), 200)
         },
         view_files: function(appendfiles) {
-            this.fileresponsesimplifiedfilemanager.removeClass('fm-updating').removeClass('fm-noitems');
+            this.filemanager.removeClass('fm-updating').removeClass('fm-noitems');
             if ((appendfiles == null) && (!this.options.list || this.options.list.length == 0) && this.viewmode != 2) {
-                this.fileresponsesimplifiedfilemanager.addClass('fm-noitems');
+                this.filemanager.addClass('fm-noitems');
                 return;
             }
             var list = (appendfiles != null) ? appendfiles : this.options.list;
@@ -638,7 +638,7 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
             if (!this.lazyloading) {
                 this.lazyloading={};
             }
-            this.fileresponsesimplifiedfilemanager.one('.fp-content').fp_display_filelist(options, list, this.lazyloading);
+            this.filemanager.one('.fp-content').fp_display_filelist(options, list, this.lazyloading);
             this.content_scrolled();
         },
         /* don't download fix: eliminate license field */
@@ -805,6 +805,7 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
         },
         setup_select_file: function() {
             var selectnode = this.selectnode;
+            var scope = this;
             // bind labels with corresponding inputs
             /* don't download fix: eliminate author, license field */
             /*
@@ -952,8 +953,8 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
             }, this);
             selectnode.all('.fp-file-update, .fp-file-download, .fp-file-delete, .fp-file-zip, .fp-file-unzip, ' +
                 '.fp-file-setmain, .fp-file-cancel').on('key', function(e) {
-                e.preventDefault();
-                this.simulate('click');
+                    e.preventDefault();
+                    this.simulate('click');
             }, 'enter');
         },
         get_parent_folder_name: function(node) {
@@ -1116,10 +1117,11 @@ M.form_fileresponsesimplifiedfilemanager.init = function(Y, options) {
 
     // finally init everything needed
     // hide loading picture, display fileresponsesimplifiedfilemanager interface
-    var filemanager = Y.one('#filemanager-'+options.client_id);
+    var filemanager = Y.one('#fileresponsesimplifiedfilemanager-'+options.client_id);
     filemanager.removeClass('fm-loading').addClass('fm-loaded');
 
     var manager = new FileManagerHelper(options);
+    var dndoptions = {
         filemanager: manager,
         acceptedtypes: options.filepicker.accepted_types,
         clientid: options.client_id,

@@ -63,12 +63,10 @@ class qtype_fileresponse extends question_type {
 
         /* Fileresponse only accepts 'plain' as format. */
         $options->responseformat = 'plain';
-        $options->responserequired = $formdata->responserequired;
         $options->responsefieldlines = $formdata->responsefieldlines;
         $options->attachments = $formdata->attachments;
         $options->forcedownload = $formdata->forcedownload;
         $options->allowpickerplugins = $formdata->allowpickerplugins;
-        $options->attachmentsrequired = $formdata->attachmentsrequired;
         if (!isset($formdata->filetypeslist)) {
             $options->filetypeslist = "";
         } else {
@@ -88,12 +86,10 @@ class qtype_fileresponse extends question_type {
         parent::initialise_question_instance($question, $questiondata);
         /* Fileresponse only accepts 'plain' as format. */
         $question->responseformat = 'plain';
-        $question->responserequired = $questiondata->options->responserequired;
         $question->responsefieldlines = $questiondata->options->responsefieldlines;
         $question->attachments = $questiondata->options->attachments;
         $question->forcedownload = $questiondata->options->forcedownload;
         $question->allowpickerplugins = $questiondata->options->allowpickerplugins;
-        $question->attachmentsrequired = $questiondata->options->attachmentsrequired;
         $question->graderinfo = $questiondata->options->graderinfo;
         $question->graderinfoformat = $questiondata->options->graderinfoformat;
         /* Fileresponse doesn't display a response template. */

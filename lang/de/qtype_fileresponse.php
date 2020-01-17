@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['acceptedfiletypes'] = 'Akzeptierte Dateitypen';
+$string['acceptedfiletypes_help'] = 'Die akzeptierten Dateitypen können als kommagetrennte Liste mit Dateiendungen eingeschränkt werden. Falls das Feld leer ist, sind alle Dateitypen erlaubt.';
 $string['advice'] = 'Bitte beachten Sie';
 $string['allowpickerplugins'] = 'Dateiauswahl-Plugins';
 $string['allowpickerpluginsno'] = 'Deaktiviert (nur &#34;Datei hochladen&#34;)';

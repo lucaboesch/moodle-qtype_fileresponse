@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['acceptedfiletypes'] = 'Types de fichiers acceptés';
+$string['acceptedfiletypes_help'] = 'Les types de fichier acceptés peuvent être restreints en saisissant une liste d\'extensions de fichiers. Si le champ est laissé vide, tous les types de fichier seront acceptés.';
 $string['advice'] = 'Prière de noter';
 $string['allowpickerplugins'] = 'Allow File Picker Plugins';
 $string['allowpickerpluginsno'] = 'No, just &#34;Upload a file&#34;';

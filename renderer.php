@@ -48,13 +48,17 @@ class qtype_fileresponse_renderer extends qtype_renderer {
             $step = new question_attempt_step(array('answer'=>$question->responsetemplate));
         }
 
-        if (empty($options->readonly)) {
-            $answer = $responseoutput->response_area_input('answer', $qa,
+        if ($question->responsefieldlines > 0) {
+            if (empty($options->readonly)) {
+                $answer = $responseoutput->response_area_input('answer', $qa,
                     $step, $question->responsefieldlines, $options->context);
 
-        } else {
-            $answer = $responseoutput->response_area_read_only('answer', $qa,
+            } else {
+                $answer = $responseoutput->response_area_read_only('answer', $qa,
                     $step, $question->responsefieldlines, $options->context);
+            }
+        } else {
+            $answer = '';
         }
 
         $files = '';

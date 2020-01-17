@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version = 2019120200;
-$plugin->requires = 2016120502; // moodle 3.2.x
+$plugin->requires = 2017110800;
 $plugin->cron      = 0;
 $plugin->component = 'qtype_fileresponse';
 $plugin->maturity = MATURITY_STABLE;

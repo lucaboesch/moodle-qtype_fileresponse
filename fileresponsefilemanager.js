@@ -88,18 +88,18 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
                 this.filecount = 0;
             }
             // prepare fileresponsefilemanager for drag-and-drop upload
-            this.fileresponsefilemanager = Y.one('#fileresponsefilemanager-'+options.client_id);
-            if (this.fileresponsefilemanager.hasClass('fileresponsefilemanager-container') || !this.fileresponsefilemanager.one('.fileresponsefilemanager-container')) {
-                this.dndcontainer = this.fileresponsefilemanager;
+            this.filemanager = Y.one('#fileresponsefilemanager-'+options.client_id);
+            if (this.filemanager.hasClass('filemanager-container') || !this.filemanager.one('.filemanager-container')) {
+                this.dndcontainer = this.filemanager;
             } else  {
-                this.dndcontainer = this.fileresponsefilemanager.one('.fileresponsefilemanager-container');
+                this.dndcontainer = this.filemanager.one('.filemanager-container');
                 if (!this.dndcontainer.get('id')) {
                     this.dndcontainer.generateID();
                 }
             }
             // save template for one path element and location of path bar
-            if (this.fileresponsefilemanager.one('.fp-path-folder')) {
-                this.pathnode = this.fileresponsefilemanager.one('.fp-path-folder');
+            if (this.filemanager.one('.fp-path-folder')) {
+                this.pathnode = this.filemanager.one('.fp-path-folder');
                 this.pathbar = this.pathnode.get('parentNode');
                 this.pathbar.removeChild(this.pathnode);
             }
@@ -125,20 +125,20 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
             // setup buttons onclick events
             this.setup_buttons();
             // set event handler for lazy loading of thumbnails
-            this.fileresponsefilemanager.one('.fp-content').on(['scroll','resize'], this.content_scrolled, this);
+            this.filemanager.one('.fp-content').on(['scroll','resize'], this.content_scrolled, this);
             // display files
             this.viewmode = this.get_preference("recentviewmode");
             if (this.viewmode != 2 && this.viewmode != 3) {
                 this.viewmode = 1;
             }
             var viewmodeselectors = {'1': '.fp-vb-icons', '2': '.fp-vb-tree', '3': '.fp-vb-details'};
-            this.fileresponsefilemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked');
-            this.fileresponsefilemanager.all(viewmodeselectors[this.viewmode]).addClass('checked');
+            this.filemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked');
+            this.filemanager.all(viewmodeselectors[this.viewmode]).addClass('checked');
             this.refresh(this.currentpath); // MDL-31113 get latest list from server
         },
 
         wait: function() {
-           this.fileresponsefilemanager.addClass('fm-updating');
+           this.filemanager.addClass('fm-updating');
         },
         request: function(args, redraw) {
             var api = this.api + '?action='+args.action;
@@ -204,15 +204,15 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
         },
         check_buttons: function() {
             if (this.filecount>0) {
-                this.fileresponsefilemanager.removeClass('fm-nofiles');
+                this.filemanager.removeClass('fm-nofiles');
             } else {
-                this.fileresponsefilemanager.addClass('fm-nofiles');
+                this.filemanager.addClass('fm-nofiles');
             }
             if (this.filecount >= this.maxfiles && this.maxfiles!=-1) {
-                this.fileresponsefilemanager.addClass('fm-maxfiles');
+                this.filemanager.addClass('fm-maxfiles');
             }
             else {
-                this.fileresponsefilemanager.removeClass('fm-maxfiles');
+                this.filemanager.removeClass('fm-maxfiles');
             }
         },
         refresh: function(filepath) {
@@ -266,17 +266,17 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
             this.msg_dlg.show();
         },
         is_disabled: function() {
-            return this.fileresponsefilemanager.ancestor('.fitem.disabled') != null;
+            return this.filemanager.ancestor('.fitem.disabled') != null;
         },
         setup_buttons: function() {
-            var button_download = this.fileresponsefilemanager.one('.fp-btn-download');
-            var button_create   = this.fileresponsefilemanager.one('.fp-btn-mkdir');
-            var button_addfile  = this.fileresponsefilemanager.one('.fp-btn-add');
+            var button_download = this.filemanager.one('.fp-btn-download');
+            var button_create   = this.filemanager.one('.fp-btn-mkdir');
+            var button_addfile  = this.filemanager.one('.fp-btn-add');
 
             // setup 'add file' button
             button_addfile.on('click', this.show_filepicker, this);
 
-            var dndarrow = this.fileresponsefilemanager.one('.dndupload-arrow');
+            var dndarrow = this.filemanager.one('.dndupload-arrow');
             if (dndarrow) {
                 dndarrow.on('click', this.show_filepicker, this);
             }
@@ -361,7 +361,7 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
                     Y.all('#fm-curpath-'+scope.client_id).setContent(this.currentpath);
                 }, this);
             } else {
-                this.fileresponsefilemanager.addClass('fm-nomkdir');
+                this.filemanager.addClass('fm-nomkdir');
             }
 
             // setup 'download this folder' button
@@ -372,7 +372,7 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
                 }
                 var scope = this;
 
-                var image_downloading = this.fileresponsefilemanager.one('.fp-img-downloading');
+                var image_downloading = this.filemanager.one('.fp-img-downloading');
                 if (image_downloading.getStyle('display') == 'inline') {
                     return;
                 }
@@ -383,7 +383,7 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
                     action: 'downloaddir',
                     scope: scope,
                     callback: function(id, obj, args) {
-                        var image_downloading = scope.fileresponsefilemanager.one('.fp-img-downloading');
+                        var image_downloading = scope.filemanager.one('.fp-img-downloading');
                         image_downloading.setStyle('display', 'none');
 
                         if (obj) {
@@ -402,12 +402,12 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
                 });
             }, this);
 
-            this.fileresponsefilemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').
+            this.filemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').
                 on('click', function(e) {
                     e.preventDefault();
-                    var viewbar = this.fileresponsefilemanager.one('.fp-viewbar')
+                    var viewbar = this.filemanager.one('.fp-viewbar')
                     if (!this.is_disabled() && (!viewbar || !viewbar.hasClass('disabled'))) {
-                        this.fileresponsefilemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked')
+                        this.filemanager.all('.fp-vb-icons,.fp-vb-tree,.fp-vb-details').removeClass('checked')
                         if (e.currentTarget.hasClass('fp-vb-tree')) {
                             this.viewmode = 2;
                         } else if (e.currentTarget.hasClass('fp-vb-details')) {
@@ -417,8 +417,8 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
                         }
                         e.currentTarget.addClass('checked')
                         this.render();
-                        this.fileresponsefilemanager.one('.fp-content').setAttribute('tabIndex', '0');
-                        this.fileresponsefilemanager.one('.fp-content').focus();
+                        this.filemanager.one('.fp-content').setAttribute('tabIndex', '0');
+                        this.filemanager.one('.fp-content').focus();
                         this.set_preference('recentviewmode', this.viewmode);
                     }
                 }, this);
@@ -533,7 +533,7 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
                 if (this.processingimages) {return;}
                 this.processingimages = true;
                 var scope = this,
-                    fpcontent = this.fileresponsefilemanager.one('.fp-content'),
+                    fpcontent = this.filemanager.one('.fp-content'),
                     fpcontenty = fpcontent.getY(),
                     fpcontentheight = fpcontent.getStylePx('height'),
                     is_node_visible = function(node) {
@@ -555,9 +555,9 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
             }, this), 200)
         },
         view_files: function(appendfiles) {
-            this.fileresponsefilemanager.removeClass('fm-updating').removeClass('fm-noitems');
+            this.filemanager.removeClass('fm-updating').removeClass('fm-noitems');
             if ((appendfiles == null) && (!this.options.list || this.options.list.length == 0) && this.viewmode != 2) {
-                this.fileresponsefilemanager.addClass('fm-noitems');
+                this.filemanager.addClass('fm-noitems');
                 return;
             }
             var list = (appendfiles != null) ? appendfiles : this.options.list;
@@ -636,7 +636,7 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
             if (!this.lazyloading) {
                 this.lazyloading={};
             }
-            this.fileresponsefilemanager.one('.fp-content').fp_display_filelist(options, list, this.lazyloading);
+            this.filemanager.one('.fp-content').fp_display_filelist(options, list, this.lazyloading);
             this.content_scrolled();
         },
         populate_licenses_select: function(node) {
@@ -1072,13 +1072,14 @@ M.form_fileresponsefilemanager.init = function(Y, options) {
         set_preference: function(name, value) {
             if (this.userprefs[name] != value) {
                 M.util.set_user_preference('filemanager_' + name, value);
+                this.userprefs[name] = value;
             }
         },
     });
 
     // finally init everything needed
-    // hide loading picture, display fileresponsefilemanager interface
-    var filemanager = Y.one('#filemanager-'+options.client_id);
+    // hide loading picture, display filemanager interface
+    var filemanager = Y.one('#fileresponsefilemanager-'+options.client_id);
     filemanager.removeClass('fm-loading').addClass('fm-loaded');
 
     var manager = new FileManagerHelper(options);
