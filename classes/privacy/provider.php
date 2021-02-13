@@ -8,25 +8,31 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the fileresponse question type.
- *
  * @package    qtype_fileresponse
  * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace qtype_fileresponse\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2019120200;
-$plugin->requires = 2017110800;
-$plugin->cron      = 0;
-$plugin->component = 'qtype_fileresponse';
-$plugin->supported = [36, 310];
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release   = 'v3.6-r1';
+/**
+ * Privacy Subsystem for qtype_fileresponse implementing null_provider.
+ *
+ *
+ */
+
+class provider implements \core_privacy\local\metadata\null_provider {
+
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
+}

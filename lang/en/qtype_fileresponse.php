@@ -59,4 +59,4 @@ $string['oneattachmentexpected'] = '1 file required.';
 $string['oneattachmentsubmitted'] = '1 file uploaded.';
 $string['oneofnattachmentssubmitted'] = '1 of {$a} files uploaded.';
 $string['oneofoneattachmentsubmitted'] = '1 of 1 files uploaded.';
-
+$string['privacy:metadata'] = 'The File Response question type plugin does not store any personal data.';
