@@ -303,9 +303,11 @@ class qtype_fileresponse_renderer extends qtype_renderer {
         }
 
         $question = $qa->get_question();
-        return html_writer::nonempty_tag('div', $question->format_text(
-            $question->graderinfo, $question->graderinfo, $qa, 'qtype_fileresponse',
-            'graderinfo', $question->id), array('class' => 'graderinfo'));
+        return html_writer::nonempty_tag('div',
+                $question->format_text($question->graderinfo, $question->questiontextformat, $qa,
+                        'qtype_fileresponse', 'graderinfo', $question->id),
+                array('class' => 'graderinfo'
+                ));
     }
 }
 
