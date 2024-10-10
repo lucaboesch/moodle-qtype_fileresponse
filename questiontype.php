@@ -35,26 +35,30 @@ require_once($CFG->libdir . '/questionlib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_fileresponse extends question_type {
+    #[\Override]
     public function is_manual_graded() {
         return true;
     }
 
+    #[\Override]
     public function response_file_areas() {
-        return array('attachments', 'answer');
+        return ['attachments', 'answer'];
     }
 
+    #[\Override]
     public function get_question_options($question) {
         global $DB;
         $question->options = $DB->get_record('qtype_fileresponse_options',
-            array('questionid' => $question->id), '*', MUST_EXIST);
+            ['questionid' => $question->id], '*', MUST_EXIST);
         parent::get_question_options($question);
     }
 
+    #[\Override]
     public function save_question_options($formdata) {
         global $DB;
         $context = $formdata->context;
 
-        $options = $DB->get_record('qtype_fileresponse_options', array('questionid' => $formdata->id));
+        $options = $DB->get_record('qtype_fileresponse_options', ['questionid' => $formdata->id]);
         if (!$options) {
             $options = new stdClass();
             $options->questionid = $formdata->id;
@@ -86,6 +90,7 @@ class qtype_fileresponse extends question_type {
         $DB->update_record('qtype_fileresponse_options', $options);
     }
 
+    #[\Override]
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
         /* Fileresponse only accepts 'plain' as format. */
@@ -104,39 +109,46 @@ class qtype_fileresponse extends question_type {
         $question->filetypeslist = $filetypesutil->normalize_file_types($questiondata->options->filetypeslist);
     }
 
+    #[\Override]
     public function delete_question($questionid, $contextid) {
         global $DB;
 
-        $DB->delete_records('qtype_fileresponse_options', array('questionid' => $questionid));
+        $DB->delete_records('qtype_fileresponse_options', ['questionid' => $questionid]);
         parent::delete_question($questionid, $contextid);
     }
 
     /**
+     * Returns the available response formats for the question type.
+     *
      * @return array the different response formats that the question type supports.
      * internal name => human-readable name.
      */
     public function response_formats() {
         /* Fileresponse only accepts 'plain' as format. */
-        return array(
-            'plain' => get_string('formatplain', 'qtype_fileresponse')
-        );
+        return [
+            'plain' => get_string('formatplain', 'qtype_fileresponse'),
+        ];
     }
 
     /**
+     * Returns the available options for the question type.
+     *
      * @return array the choices that should be offered when asking if a response is required
      */
     public function response_required_options() {
-        return array(
+        return [
             1 => get_string('responseisrequired', 'qtype_fileresponse'),
             0 => get_string('responsenotrequired', 'qtype_fileresponse'),
-        );
+        ];
     }
 
     /**
+     * Returns the available response field sizes for the question type.
+     *
      * @return array the choices that should be offered for the input box size.
      */
     public function response_sizes() {
-        $choices = array();
+        $choices = [];
         for ($lines = 0; $lines <= 40; $lines += 5) {
             if ($lines == 0) {
                 $choices[$lines] = get_string('noinputbox', 'qtype_fileresponse');
@@ -148,51 +160,61 @@ class qtype_fileresponse extends question_type {
     }
 
     /**
+     * Returns the available attachment options for the question type.
+     *
      * @return array the choices that should be offered for the number of attachments.
      */
     public function attachment_options() {
-        return array(
+        return [
             // Fileresponse has to have at least one file required.
             1 => '1',
             2 => '2',
             3 => '3',
             -1 => get_string('unlimited'),
-        );
+        ];
     }
 
     /**
+     * Returns the required options for the question type.
+     *
      * @return array the choices that should be offered for the number of required attachments.
      */
     public function attachments_required_options() {
-        return array(
+        return [
             0 => get_string('attachmentsoptional', 'qtype_fileresponse'),
             1 => '1',
             2 => '2',
-            3 => '3'
-        );
+            3 => '3',
+        ];
     }
+
     /**
+     * Returns the available forcedownload options for the question type.
+     *
      * @return array the choices that should be offered for the forcedownload.
      */
     public function forcedownload_options() {
-        return array(
+        return [
             0 => get_string('withdownload', 'qtype_fileresponse'),
             1 => get_string('withoutdownload', 'qtype_fileresponse'),
 
-        );
+        ];
     }
 
     /**
+     * Returns the available allowpickerplugins options for the question type.
+     *
      * @return array the choices that should be offered for the allowpickerplugins.
      */
     public function allowpickerplugins_options() {
-        return array(
+        return [
             0 => get_string('allowpickerpluginsno', 'qtype_fileresponse'),
             1 => get_string('allowpickerpluginsyes', 'qtype_fileresponse'),
 
-        );
+        ];
     }
 
+    #[\Override]
     public function move_files($questionid, $oldcontextid, $newcontextid) {
         parent::move_files($questionid, $oldcontextid, $newcontextid);
         $fs = get_file_storage();
@@ -200,6 +222,7 @@ class qtype_fileresponse extends question_type {
             $newcontextid, 'qtype_fileresponse', 'graderinfo', $questionid);
     }
 
+    #[\Override]
     protected function delete_files($questionid, $contextid) {
         parent::delete_files($questionid, $contextid);
         $fs = get_file_storage();
@@ -265,29 +288,29 @@ class qtype_fileresponse extends question_type {
         $question->qtype = 'fileresponse';
 
         $question->responseformat = $format->getpath($data,
-            array('#', 'responseformat', 0, '#', 'text', 0, '#'
-            ), 'plain');
+            ['#', 'responseformat', 0, '#', 'text', 0, '#',
+            ], 'plain');
         $question->responsefieldlines = $format->getpath($data,
-            array('#', 'responsefieldlines', 0, '#'
-            ), 0);
+            ['#', 'responsefieldlines', 0, '#',
+            ], 0);
         $question->attachments = $format->getpath($data,
-            array('#', 'attachments', 0, '#'
-            ), 0);
+            ['#', 'attachments', 0, '#',
+            ], 0);
         $question->forcedownload = $format->getpath($data,
-            array('#', 'forcedownload', 0, '#'
-            ), 0);
+            ['#', 'forcedownload', 0, '#',
+            ], 0);
         $question->allowpickerplugins = $format->getpath($data,
-            array('#', 'allowpickerplugins', 0, '#'
-            ), 0);
-        $question->graderinfo = array();
+            ['#', 'allowpickerplugins', 0, '#',
+            ], 0);
+        $question->graderinfo = [];
         $question->graderinfo['text'] = $format->getpath($data,
-            array('#', 'graderinfo', 0, '#', 'text', 0, '#'
-            ), '', true);
+            ['#', 'graderinfo', 0, '#', 'text', 0, '#',
+            ], '', true);
         $question->graderinfo['format'] = $format->getpath($data,
-            array('#', 'graderinfo', 0, '@', 'format'), 1);
+            ['#', 'graderinfo', 0, '@', 'format'], 1);
         // Restore files in graderinfo.
-        $files = $format->getpath($data, array('#', 'graderinfo', 0, '#', 'file'
-        ), array(), false);
+        $files = $format->getpath($data, ['#', 'graderinfo', 0, '#', 'file',
+        ], [], false);
         foreach ($files as $file) {
             $filesdata = new stdclass();
             $filesdata->content = $file['#'];
@@ -295,7 +318,7 @@ class qtype_fileresponse extends question_type {
             $filesdata->name = $file['@']['name'];
             $question->graderinfo['files'][] = $filesdata;
         }
-        $question->graderinfoformat = $format->getpath($data, array('#', 'graderinfoformat', 0, '#'), 1);
+        $question->graderinfoformat = $format->getpath($data, ['#', 'graderinfoformat', 0, '#'], 1);
         return $question;
     }
 }

@@ -30,12 +30,21 @@
  */
 class qtype_fileresponse_question extends question_with_responses {
 
+    /**
+     * @var string The format of the response field.
+     */
     public $responseformat;
 
     /** @var int Indicates whether an inline response is required ('0') or optional ('1')  */
     public $responserequired;
 
+    /**
+     * @var int The number of lines the field shown to the students is high.
+     */
     public $responsefieldlines;
+    /**
+     * @var int The number of attachments the student can upload.
+     */
     public $attachments;
 
     /** @var int The number of attachments required for a response to be complete. */
@@ -47,31 +56,47 @@ class qtype_fileresponse_question extends question_with_responses {
     /** @var int Whether to allow file picker repositories. */
     public $allowpickerplugins;
 
+    /**
+     * @var string The text to be displayed to the grader.
+     */
     public $graderinfo;
+    /**
+     * @var string The format of the text to be displayed to the grader.
+     */
     public $graderinfoformat;
+    /**
+     * @var string The text to be used by the students for a template.
+     */
     public $responsetemplate;
+    /**
+     * @var string The format of the text to be used by the students for a template.
+     */
     public $responsetemplateformat;
 
     /** @var array The string array of file types accepted upon file submission. */
     public $filetypeslist;
 
+    #[\Override]
     public function make_behaviour(question_attempt $qa, $preferredbehaviour) {
         return question_engine::make_behaviour('manualgraded', $qa, $preferredbehaviour);
     }
 
     /**
+     * Returns the renderer for a specific question fileresponse type.
+     *
      * @param moodle_page the page we are outputting to.
-     * @return qtype_fileresponse_format_renderer_base the response-format-specific renderer.
+     * @return qtype_essay_format_renderer_base the response-format-specific renderer.
      */
     public function get_format_renderer(moodle_page $page) {
         return $page->get_renderer('qtype_fileresponse', 'format_' . $this->responseformat);
     }
 
+    #[\Override]
     public function get_expected_data() {
         if ($this->responseformat == 'editorfilepicker') {
-            $expecteddata = array('answer' => question_attempt::PARAM_RAW_FILES);
+            $expecteddata = ['answer' => question_attempt::PARAM_RAW_FILES];
         } else {
-            $expecteddata = array('answer' => PARAM_RAW);
+            $expecteddata = ['answer' => PARAM_RAW];
         }
         $expecteddata['answerformat'] = PARAM_ALPHANUMEXT;
         if ($this->attachments != 0) {
@@ -80,15 +105,17 @@ class qtype_fileresponse_question extends question_with_responses {
         return $expecteddata;
     }
 
+    #[\Override]
     public function summarise_response(array $response) {
         if (isset($response['answer'])) {
             /* Return a list of the files' uploaded names. */
-            return html_to_text(format_text($response['answer'], FORMAT_HTML, array('para' => false)), 0, false);
+            return html_to_text(format_text($response['answer'], FORMAT_HTML, ['para' => false]), 0, false);
         } else {
             return null;
         }
     }
 
+    #[\Override]
     public function un_summarise_response(string $summary) {
         if (!empty($summary)) {
             return ['answer' => text_to_html($summary)];
@@ -97,10 +124,12 @@ class qtype_fileresponse_question extends question_with_responses {
         }
     }
 
+    #[\Override]
     public function get_correct_response() {
         return null;
     }
 
+    #[\Override]
     public function is_complete_response(array $response) {
         // Determine if the given response has online text and attachments.
         $hasinlinetext = array_key_exists('answer', $response) && ($response['answer'] !== '');
@@ -112,7 +141,7 @@ class qtype_fileresponse_question extends question_with_responses {
             // Check the filetypes.
             $filetypesutil = new \core_form\filetypes_util();
             $allowlist = $filetypesutil->normalize_file_types($this->filetypeslist);
-            $wrongfiles = array();
+            $wrongfiles = [];
             foreach ($response['attachments']->get_files() as $file) {
                 if (!$filetypesutil->is_allowed_file_type($file->get_filename(), $allowlist)) {
                     $wrongfiles[] = $file->get_filename();
@@ -137,6 +166,7 @@ class qtype_fileresponse_question extends question_with_responses {
         return $hascontent && $meetsinlinereq && $meetsattachmentreq;
     }
 
+    #[\Override]
     public function is_gradable_response(array $response) {
         // Determine if the given response has online text and attachments.
         if (array_key_exists('answer', $response) && ($response['answer'] !== '')) {
@@ -149,6 +179,7 @@ class qtype_fileresponse_question extends question_with_responses {
         }
     }
 
+    #[\Override]
     public function is_same_response(array $prevresponse, array $newresponse) {
         if (array_key_exists('answer', $prevresponse) && $prevresponse['answer'] !== $this->responsetemplate) {
             $value1 = (string) $prevresponse['answer'];
@@ -165,6 +196,7 @@ class qtype_fileresponse_question extends question_with_responses {
                     $prevresponse, $newresponse, 'attachments'));
     }
 
+    #[\Override]
     public function check_file_access($qa, $options, $component, $filearea, $args, $forcedownload) {
         if ($component == 'question' && $filearea == 'response_attachments') {
             // Response attachments visible if the question has them.

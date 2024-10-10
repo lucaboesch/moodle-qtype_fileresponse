@@ -34,6 +34,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class qtype_fileresponse_renderer extends qtype_renderer {
 
+    #[\Override]
     public function formulation_and_controls(question_attempt $qa,
             question_display_options $options) {
 
@@ -45,7 +46,7 @@ class qtype_fileresponse_renderer extends qtype_renderer {
 
         if (!$step->has_qt_var('answer') && empty($options->readonly)) {
             // Question has never been answered, fill it with response template.
-            $step = new question_attempt_step(array('answer' => $question->responsetemplate));
+            $step = new question_attempt_step(['answer' => $question->responsetemplate]);
         }
 
         if ($question->responsefieldlines > 0) {
@@ -74,13 +75,13 @@ class qtype_fileresponse_renderer extends qtype_renderer {
 
         $result = '';
         $result .= html_writer::tag('div', $question->format_questiontext($qa),
-                array('class' => 'qtext'));
+                ['class' => 'qtext']);
 
-        $result .= html_writer::start_tag('div', array('class' => 'ablock'));
+        $result .= html_writer::start_tag('div', ['class' => 'ablock']);
 
         if ($answer) {
-            $result .= html_writer::tag('div', $answer, array('class' => 'qtext'
-            ));
+            $result .= html_writer::tag('div', $answer, ['class' => 'qtext',
+            ]);
         }
 
         /* How many files are expected, already uploaded and saved ? */
@@ -94,15 +95,15 @@ class qtype_fileresponse_renderer extends qtype_renderer {
             case 1: // One file required.
                 $result .= html_writer::tag('div',
                     get_string('oneattachmentexpected', 'qtype_fileresponse'),
-                    array('class' => 'answer'
-                    ));
+                    ['class' => 'answer',
+                    ]);
                 break;
             default: // Two or three file required.
                 $result .= html_writer::tag('div',
                     get_string('nattachmentsexpected', 'qtype_fileresponse',
                         $expectedattachments),
-                    array('class' => 'answer'
-                    ));
+                    ['class' => 'answer',
+                    ]);
                 break;
         }
 
@@ -118,16 +119,16 @@ class qtype_fileresponse_renderer extends qtype_renderer {
                     $result .= html_writer::tag('div',
                         get_string('oneattachmentsubmitted', 'qtype_fileresponse') .
                         "<br />&#160;<br />",
-                        array('class' => 'answer'
-                        ));
+                        ['class' => 'answer',
+                        ]);
                     break;
                 default:
                     // Exactly n > 1 files of unlimited submitted.
                     $result .= html_writer::tag('div',
                         get_string('nattachmentssubmitted', 'qtype_fileresponse', $filecount) .
                         "<br />&#160;<br />",
-                        array('class' => 'answer'
-                        ));
+                        ['class' => 'answer',
+                        ]);
                     break;
             }
         } else if ($expectedattachments == 1) {
@@ -137,22 +138,22 @@ class qtype_fileresponse_renderer extends qtype_renderer {
                 $result .= html_writer::tag('div',
                     get_string('noofoneattachmentsubmitted', 'qtype_fileresponse') .
                     "<br />&#160;<br />",
-                    array('class' => 'answer'
-                    ));
+                    ['class' => 'answer',
+                    ]);
             } else if ($filecount == 1) {
                 // Exactly 1 file of 1 submitted.
                 $result .= html_writer::tag('div',
                     get_string('oneofoneattachmentsubmitted', 'qtype_fileresponse') .
                     "<br />&#160;<br />",
-                    array('class' => 'answer'
-                    ));
+                    ['class' => 'answer',
+                    ]);
             } else {
                 // This should not happen: $filecount larger than $expectedattachments.
                 $result .= html_writer::tag('div',
                     get_string('nattachmentssubmitted', 'qtype_fileresponse', $filecount) .
                     "<br />&#160;<br />",
-                    array('class' => 'answer'
-                    ));
+                    ['class' => 'answer',
+                    ]);
             }
         } else {
             /* Exactly a certain amount (but more than one) of attachment expected. */
@@ -161,33 +162,33 @@ class qtype_fileresponse_renderer extends qtype_renderer {
                 $result .= html_writer::tag('div',
                     get_string('noofnattachmentsubmitted', 'qtype_fileresponse',
                         $expectedattachments) . "<br />&#160;<br />",
-                    array('class' => 'answer'
-                    ));
+                    ['class' => 'answer',
+                    ]);
             } else if (($expectedattachments > 1) && ($filecount == 1)) {
                 /* Exactly one file of n > 1 submitted. */
                 $result .= html_writer::tag('div',
                     get_string('oneofnattachmentssubmitted', 'qtype_fileresponse',
                         $expectedattachments) . "<br />&#160;<br />",
-                    array('class' => 'answer'
-                    ));
+                    ['class' => 'answer',
+                    ]);
             } else if ($filecount > $expectedattachments) {
                 /* This should not happen: $filecount larger than $expectedattachments. */
                 $result .= html_writer::tag('div',
                     get_string('nattachmentssubmitted', 'qtype_fileresponse', $filecount) .
                     "<br />&#160;<br />",
-                    array('class' => 'answer'
-                    ));
+                    ['class' => 'answer',
+                    ]);
             } else {
                 /* n > 1 files of n > 1 submitted yet. */
                 $result .= html_writer::tag('div',
                     $filecount . get_string('ofnattachmentssubmitted', 'qtype_fileresponse',
                         $expectedattachments) . "<br />&#160;<br />",
-                    array('class' => 'answer'
-                    ));
+                    ['class' => 'answer',
+                    ]);
             }
         }
-        $result .= html_writer::tag('div', $files, array('class' => 'attachments'
-        ));
+        $result .= html_writer::tag('div', $files, ['class' => 'attachments',
+        ]);
 
         $result .= html_writer::end_tag('div');
 
@@ -202,12 +203,12 @@ class qtype_fileresponse_renderer extends qtype_renderer {
      */
     public function files_read_only(question_attempt $qa, question_display_options $options) {
         $files = $qa->get_last_qt_files('attachments', $options->context->id);
-        $output = array();
+        $output = [];
 
         foreach ($files as $file) {
             $output[] = html_writer::tag('p', html_writer::link($qa->get_response_file_url($file),
                    $this->output->pix_icon(file_file_icon($file), get_mimetype_description($file),
-                    'moodle', array('class' => 'icon')) . ' ' . s($file->get_filename())));
+                    'moodle', ['class' => 'icon']) . ' ' . s($file->get_filename())));
         }
         return implode($output);
     }
@@ -259,9 +260,9 @@ class qtype_fileresponse_renderer extends qtype_renderer {
             $filesrenderer = $this->page->get_renderer('qtype_fileresponse',
                 'fileresponsesimplifiedfilemanager');
             return $filesrenderer->render($frsfm) . html_writer::empty_tag('input',
-                    array('type' => 'hidden', 'name' => $qa->get_qt_field_name('attachments'),
-                        'value' => $pickeroptions->itemid
-                    )) . $text;
+                    ['type' => 'hidden', 'name' => $qa->get_qt_field_name('attachments'),
+                        'value' => $pickeroptions->itemid,
+                    ]) . $text;
         } else {
             // Allow download.
             require_once('fileresponsefilemanager.php');
@@ -270,9 +271,9 @@ class qtype_fileresponse_renderer extends qtype_renderer {
             $filesrenderer = $this->page->get_renderer('qtype_fileresponse',
                 'fileresponsefilemanager');
             return $filesrenderer->render($frfm) . html_writer::empty_tag('input',
-                    array('type' => 'hidden', 'name' => $qa->get_qt_field_name('attachments'),
-                        'value' => $pickeroptions->itemid
-                    )) . $text;
+                    ['type' => 'hidden', 'name' => $qa->get_qt_field_name('attachments'),
+                        'value' => $pickeroptions->itemid,
+                    ]) . $text;
         }
     }
 
@@ -297,6 +298,7 @@ class qtype_fileresponse_renderer extends qtype_renderer {
         return $counter;
     }
 
+    #[\Override]
     public function manual_comment(question_attempt $qa, question_display_options $options) {
         if ($options->manualcomment != question_display_options::EDITABLE) {
             return '';
@@ -306,8 +308,8 @@ class qtype_fileresponse_renderer extends qtype_renderer {
         return html_writer::nonempty_tag('div',
                 $question->format_text($question->graderinfo, $question->questiontextformat, $qa,
                         'qtype_fileresponse', 'graderinfo', $question->id),
-                array('class' => 'graderinfo'
-                ));
+                ['class' => 'graderinfo',
+                ]);
     }
 }
 
@@ -320,8 +322,10 @@ class qtype_fileresponse_renderer extends qtype_renderer {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class qtype_fileresponse_format_renderer_base extends plugin_renderer_base {
+
     /**
-     * Render the students respone when the question is in read-only mode.
+     * Render the students response when the question is in read-only mode.
+     *
      * @param string $name the variable name this input edits.
      * @param question_attempt $qa the question attempt being display.
      * @param question_attempt_step $step the current step.
@@ -333,7 +337,8 @@ abstract class qtype_fileresponse_format_renderer_base extends plugin_renderer_b
             question_attempt_step $step, $lines, $context);
 
     /**
-     * Render the students respone when the question is in read-only mode.
+     * Render the students response when the question is in standard mode ready to receive input.
+     *
      * @param string $name the variable name this input edits.
      * @param question_attempt $qa the question attempt being display.
      * @param question_attempt_step $step the current step.
@@ -345,9 +350,11 @@ abstract class qtype_fileresponse_format_renderer_base extends plugin_renderer_b
             question_attempt_step $step, $lines, $context);
 
     /**
-     * @return string specific class name to add to the input element.
+     * Return the class name for the renderer.
+     *
+     * @return string the class name.
      */
-    abstract protected function class_name();
+    abstract protected function class_name(): string;
 }
 
 /**
@@ -359,14 +366,39 @@ abstract class qtype_fileresponse_format_renderer_base extends plugin_renderer_b
  */
 class qtype_fileresponse_format_noinline_renderer extends plugin_renderer_base {
 
-    protected function class_name() {
+    /**
+     * Return the class name for the renderer.
+     *
+     * @return string the class name.
+     */
+    protected function class_name(): string {
         return 'qtype_fileresponse_noinline';
     }
 
+    /**
+     * Render the students response when the question is in read-only mode.
+     *
+     * @param string $name the variable name this input edits.
+     * @param question_attempt $qa the question attempt being display.
+     * @param question_attempt_step $step the current step.
+     * @param int $lines approximate size of input box to display.
+     * @param object $context the context teh output belongs to.
+     * @return string html to display the response.
+     */
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
         return '';
     }
 
+    /**
+     * Render the students response when the question is in standard mode ready to receive input.
+     *
+     * @param string $name the variable name this input edits.
+     * @param question_attempt $qa the question attempt being display.
+     * @param question_attempt_step $step the current step.
+     * @param int $lines approximate size of input box to display.
+     * @param object $context the context teh output belongs to.
+     * @return string html to display the response for editing.
+     */
     public function response_area_input($name, $qa, $step, $lines, $context) {
         return '';
     }
@@ -381,15 +413,41 @@ class qtype_fileresponse_format_noinline_renderer extends plugin_renderer_base {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_fileresponse_format_editor_renderer extends plugin_renderer_base {
-    protected function class_name() {
+
+    /**
+     * Return the class name for the renderer.
+     *
+     * @return string the class name.
+     */
+    protected function class_name(): string {
         return 'qtype_fileresponse_editor';
     }
 
+    /**
+     * Render the students response when the question is in read-only mode.
+     *
+     * @param string $name the variable name this input edits.
+     * @param question_attempt $qa the question attempt being display.
+     * @param question_attempt_step $step the current step.
+     * @param int $lines approximate size of input box to display.
+     * @param object $context the context teh output belongs to.
+     * @return string html to display the response.
+     */
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
         return html_writer::tag('div', $this->prepare_response($name, $qa, $step, $context),
-                array('class' => $this->class_name() . ' qtype_fileresponse_response readonly'));
+                ['class' => $this->class_name() . ' qtype_fileresponse_response readonly']);
     }
 
+    /**
+     * Render the students response when the question is in standard mode ready to receive input.
+     *
+     * @param string $name the variable name this input edits.
+     * @param question_attempt $qa the question attempt being display.
+     * @param question_attempt_step $step the current step.
+     * @param int $lines approximate size of input box to display.
+     * @param object $context the context teh output belongs to.
+     * @return string html to display the response for editing.
+     */
     public function response_area_input($name, $qa, $step, $lines, $context) {
         global $CFG;
         require_once($CFG->dirroot . '/repository/lib.php');
@@ -413,17 +471,17 @@ class qtype_fileresponse_format_editor_renderer extends plugin_renderer_base {
             $this->get_filepicker_options($context, $draftitemid));
 
         $output = '';
-        $output .= html_writer::start_tag('div', array('class' =>
-                $this->class_name() . ' qtype_fileresponse_response'));
+        $output .= html_writer::start_tag('div', ['class' =>
+                $this->class_name() . ' qtype_fileresponse_response', ]);
 
         $output .= html_writer::tag('div', html_writer::tag('textarea', s($response),
-                array('id' => $id, 'name' => $inputname, 'rows' => $lines, 'cols' => 60)));
+                ['id' => $id, 'name' => $inputname, 'rows' => $lines, 'cols' => 60]));
 
         $output .= html_writer::start_tag('div');
         if (count($formats) == 1) {
             reset($formats);
-            $output .= html_writer::empty_tag('input', array('type' => 'hidden',
-                    'name' => $inputname . 'format', 'value' => key($formats)));
+            $output .= html_writer::empty_tag('input', ['type' => 'hidden',
+                    'name' => $inputname . 'format', 'value' => key($formats), ]);
 
         } else {
             $output .= html_writer::label(get_string('format'), 'menu' . $inputname . 'format', false);
@@ -440,6 +498,7 @@ class qtype_fileresponse_format_editor_renderer extends plugin_renderer_base {
 
     /**
      * Prepare the response for read-only display.
+     *
      * @param string $name the variable name this input edits.
      * @param question_attempt $qa the question attempt being display.
      * @param question_attempt_step $step the current step.
@@ -460,6 +519,7 @@ class qtype_fileresponse_format_editor_renderer extends plugin_renderer_base {
 
     /**
      * Prepare the response for editing.
+     *
      * @param string $name the variable name this input edits.
      * @param question_attempt_step $step the current step.
      * @param object $context the context the attempt belongs to.
@@ -467,28 +527,34 @@ class qtype_fileresponse_format_editor_renderer extends plugin_renderer_base {
      */
     protected function prepare_response_for_editing($name,
             question_attempt_step $step, $context) {
-        return array(0, $step->get_qt_var($name));
+        return [0, $step->get_qt_var($name)];
     }
 
     /**
+     * Get the options required to configure the editor.
+     *
      * @param object $context the context the attempt belongs to.
      * @return array options for the editor.
      */
     protected function get_editor_options($context) {
         // Disable the text-editor autosave because quiz has it's own auto save function.
-        return array('context' => $context, 'autosave' => false);
+        return ['context' => $context, 'autosave' => false];
     }
 
     /**
+     * Get the options required to configure the filepicker
+     *
      * @param object $context the context the attempt belongs to.
      * @param int $draftitemid draft item id.
      * @return array filepicker options for the editor.
      */
     protected function get_filepicker_options($context, $draftitemid) {
-        return array('return_types'  => FILE_INTERNAL | FILE_EXTERNAL);
+        return ['return_types'  => FILE_INTERNAL | FILE_EXTERNAL];
     }
 
     /**
+     * Get the HTML for the filepicker
+     *
      * @param string $inputname input field name.
      * @param int $draftitemid draft file area itemid.
      * @return string HTML for the filepicker, if used.
@@ -507,10 +573,17 @@ class qtype_fileresponse_format_editor_renderer extends plugin_renderer_base {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_fileresponse_format_editorfilepicker_renderer extends qtype_fileresponse_format_editor_renderer {
-    protected function class_name() {
+
+    /**
+     * Return the class name for the renderer.
+     *
+     * @return string the class name.
+     */
+    protected function class_name(): string {
         return 'qtype_fileresponse_editorfilepicker';
     }
 
+    #[\Override]
     protected function prepare_response($name, question_attempt $qa,
             question_attempt_step $step, $context) {
         if (!$step->has_qt_var($name)) {
@@ -524,6 +597,7 @@ class qtype_fileresponse_format_editorfilepicker_renderer extends qtype_fileresp
         return format_text($text, $step->get_qt_var($name . 'format'), $formatoptions);
     }
 
+    #[\Override]
     protected function prepare_response_for_editing($name,
             question_attempt_step $step, $context) {
         return $step->prepare_response_files_draft_itemid_with_text(
@@ -568,6 +642,8 @@ class qtype_fileresponse_format_editorfilepicker_renderer extends qtype_fileresp
     }
 
     /**
+     * Get the options required to configure the filepicker
+     *
      * @param object $context the context the attempt belongs to.
      * @param int $draftitemid draft item id.
      * @return array filepicker options for the editor.
@@ -576,22 +652,30 @@ class qtype_fileresponse_format_editorfilepicker_renderer extends qtype_fileresp
         return question_utils::get_filepicker_options($context, $draftitemid);
     }
 
+    /**
+     * Get the HTML for the filepicker
+     *
+     * @param string $inputname input field name.
+     * @param int $draftitemid draft file area itemid.
+     * @return string HTML for the filepicker, if used.
+     * @throws \core\exception\moodle_exception
+     */
     protected function filepicker_html($inputname, $draftitemid) {
-        $nonjspickerurl = new moodle_url('/repository/draftfiles_manager.php', array(
+        $nonjspickerurl = new moodle_url('/repository/draftfiles_manager.php', [
             'action' => 'browse',
             'env' => 'editor',
             'itemid' => $draftitemid,
             'subdirs' => false,
             'maxfiles' => -1,
             'sesskey' => sesskey(),
-        ));
+        ]);
 
-        return html_writer::empty_tag('input', array('type' => 'hidden',
-                'name' => $inputname . ':itemid', 'value' => $draftitemid)) .
+        return html_writer::empty_tag('input', ['type' => 'hidden',
+                'name' => $inputname . ':itemid', 'value' => $draftitemid, ]) .
                 html_writer::tag('noscript', html_writer::tag('div',
-                    html_writer::tag('object', '', array('type' => 'text/html',
+                    html_writer::tag('object', '', ['type' => 'text/html',
                         'data' => $nonjspickerurl, 'height' => 160, 'width' => 600,
-                        'style' => 'border: 1px solid #000;'))));
+                        'style' => 'border: 1px solid #000;', ])));
     }
 }
 
@@ -604,7 +688,19 @@ class qtype_fileresponse_format_editorfilepicker_renderer extends qtype_fileresp
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_fileresponse_format_plain_renderer extends plugin_renderer_base {
+
     /**
+     * Return the class name for the renderer.
+     *
+     * @return string the class name.
+     */
+    protected function class_name(): string {
+        return 'qtype_fileresponse_plain';
+    }
+
+    /**
+     * Returns the HTML for a textarea.
+     *
      * @return string the HTML for the textarea.
      */
     protected function textarea($response, $lines, $attributes) {
@@ -614,19 +710,35 @@ class qtype_fileresponse_format_plain_renderer extends plugin_renderer_base {
         return html_writer::tag('textarea', s($response), $attributes);
     }
 
-    protected function class_name() {
-        return 'qtype_fileresponse_plain';
-    }
-
+    /**
+     * Render the students response when the question is in read-only mode.
+     *
+     * @param string $name the variable name this input edits.
+     * @param question_attempt $qa the question attempt being display.
+     * @param question_attempt_step $step the current step.
+     * @param int $lines approximate size of input box to display.
+     * @param object $context the context teh output belongs to.
+     * @return string html to display the response.
+     */
     public function response_area_read_only($name, $qa, $step, $lines, $context) {
-        return $this->textarea($step->get_qt_var($name), $lines, array('readonly' => 'readonly'));
+        return $this->textarea($step->get_qt_var($name), $lines, ['readonly' => 'readonly']);
     }
 
+    /**
+     * Render the students response when the question is in standard mode ready to receive input.
+     *
+     * @param string $name the variable name this input edits.
+     * @param question_attempt $qa the question attempt being display.
+     * @param question_attempt_step $step the current step.
+     * @param int $lines approximate size of input box to display.
+     * @param object $context the context teh output belongs to.
+     * @return string html to display the response for editing.
+     */
     public function response_area_input($name, $qa, $step, $lines, $context) {
         $inputname = $qa->get_qt_field_name($name);
-        return $this->textarea($step->get_qt_var($name), $lines, array('name' => $inputname)) .
-                html_writer::empty_tag('input', array('type' => 'hidden',
-                    'name' => $inputname . 'format', 'value' => FORMAT_PLAIN));
+        return $this->textarea($step->get_qt_var($name), $lines, ['name' => $inputname]) .
+                html_writer::empty_tag('input', ['type' => 'hidden',
+                    'name' => $inputname . 'format', 'value' => FORMAT_PLAIN, ]);
     }
 }
 
@@ -640,7 +752,13 @@ class qtype_fileresponse_format_plain_renderer extends plugin_renderer_base {
  * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  */
 class qtype_fileresponse_format_monospaced_renderer extends qtype_fileresponse_format_plain_renderer {
-    protected function class_name() {
+
+    /**
+     * Return the class name for the renderer.
+     *
+     * @return string the class name.
+     */
+    protected function class_name(): string {
         return 'qtype_fileresponse_monospaced';
     }
 }

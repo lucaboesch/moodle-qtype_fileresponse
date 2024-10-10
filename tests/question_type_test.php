@@ -43,30 +43,31 @@ require_once($CFG->dirroot . '/question/type/fileresponse/edit_fileresponse_form
  * @copyright  based on work by 2007 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_type_test  extends \advanced_testcase {
-    protected $qtype;
+final class question_type_test  extends \advanced_testcase {
 
     /**
-     * explained here https://docs.moodle.org/dev/Unit_test_API
-     * @var array
+     * @var \qtype_fileresponse $qtype the question type object
      */
+    protected $qtype;
+
+    #[\Override]
     protected function setUp(): void {
+        parent::setUp();
         $this->qtype = new \qtype_fileresponse();
     }
 
-    /**
-     * explained here https://docs.moodle.org/dev/Unit_test_API
-     * @var array
-     */
+    #[\Override]
     protected function tearDown(): void {
         $this->qtype = null;
+        parent::tearDown();
     }
 
     /**
-     * explained here https://docs.moodle.org/dev/Unit_test_API
-     * @var array
+     * Get the test question data.
+     *
+     * @var \stdClass The question data
      */
-    protected function get_test_question_data() {
+    protected function get_test_question_data(): \stdClass {
         $q = new \stdClass();
         $q->id = 1;
 
@@ -78,7 +79,7 @@ class question_type_test  extends \advanced_testcase {
      *
      * @covers ::name()
      */
-    public function test_name() {
+    public function test_name(): void {
         $this->assertEquals($this->qtype->name(), 'fileresponse');
     }
 
@@ -87,7 +88,7 @@ class question_type_test  extends \advanced_testcase {
      *
      * @covers ::can_analyse_responses()
      */
-    public function test_can_analyse_responses() {
+    public function test_can_analyse_responses(): void {
         $this->assertFalse($this->qtype->can_analyse_responses());
     }
 
@@ -96,7 +97,7 @@ class question_type_test  extends \advanced_testcase {
      *
      * @covers ::get_random_guess_score()
      */
-    public function test_get_random_guess_score() {
+    public function test_get_random_guess_score(): void {
         $q = $this->get_test_question_data();
         $this->assertEquals(0, $this->qtype->get_random_guess_score($q));
     }
@@ -106,9 +107,9 @@ class question_type_test  extends \advanced_testcase {
      *
      * @covers ::get_possible_responses()
      */
-    public function test_get_possible_responses() {
+    public function test_get_possible_responses(): void {
         $q = $this->get_test_question_data();
-        $this->assertEquals(array(), $this->qtype->get_possible_responses($q));
+        $this->assertEquals([], $this->qtype->get_possible_responses($q));
 
     }
 }

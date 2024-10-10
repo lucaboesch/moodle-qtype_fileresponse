@@ -15,15 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    qtype_fileresponse
- * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-/**
  * Provides the information to backup fileresponse questions
  *
- * @copyright  2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
+ * @package    qtype_fileresponse
+ * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_qtype_fileresponse_plugin extends backup_qtype_plugin {
@@ -43,17 +38,17 @@ class backup_qtype_fileresponse_plugin extends backup_qtype_plugin {
         $plugin->add_child($pluginwrapper);
 
         // Now create the qtype own structures.
-        $fileresponse = new backup_nested_element('fileresponse', array('id'), array(
+        $fileresponse = new backup_nested_element('fileresponse', ['id'], [
                 'responseformat', 'responsefieldlines', 'attachments',
                 'graderinfo', 'graderinfoformat', 'responsetemplate',
-                'responsetemplateformat'));
+                'responsetemplateformat', ]);
 
         // Now the own qtype tree.
         $pluginwrapper->add_child($fileresponse);
 
         // Set source to populate the data.
         $fileresponse->set_source_table('qtype_fileresponse_options',
-                array('questionid' => backup::VAR_PARENTID));
+                ['questionid' => backup::VAR_PARENTID]);
 
         // Don't need to annotate ids nor files.
 
@@ -67,8 +62,8 @@ class backup_qtype_fileresponse_plugin extends backup_qtype_plugin {
      * files to be processed both in backup and restore.
      */
     public static function get_qtype_fileareas() {
-        return array(
+        return [
             'graderinfo' => 'question_created',
-        );
+        ];
     }
 }

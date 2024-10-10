@@ -29,16 +29,18 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_fileresponse_test_helper extends question_test_helper {
-    public function get_test_questions() {
-        return array('allowdownload_allowfilepicker', 'allowdownload_disallowfilepicker', 'disallowdownload_allowfilepicker',
-            'disallowdownload_disallowfilepicker');
+
+    #[\Override]
+    public function get_test_questions(): array {
+        return ['allowdownload_allowfilepicker', 'allowdownload_disallowfilepicker', 'disallowdownload_allowfilepicker',
+            'disallowdownload_disallowfilepicker', ];
     }
 
     /**
      * Helper method to reduce duplication.
      * @return qtype_fileresponse_question
      */
-    protected function initialise_fileresponse_question() {
+    protected static function initialise_fileresponse_question() {
         question_bank::load_question_definition_classes('fileresponse');
         $q = new qtype_fileresponse_question();
         test_question_maker::initialise_a_question($q);
@@ -52,7 +54,7 @@ class qtype_fileresponse_test_helper extends question_test_helper {
         $q->allowpickerplugins = 1;
         $q->graderinfo = '';
         $q->graderinfoformat = FORMAT_HTML;
-        $q->qtype = question_bank::get_qtype('fileresponse');
+        $q->qtype = \question_bank::get_qtype('fileresponse');
 
         return $q;
     }
@@ -61,8 +63,8 @@ class qtype_fileresponse_test_helper extends question_test_helper {
      * Makes a fileresponse question allowing filedownload and allowing file picker plugins.
      * @return qtype_fileresponse_question
      */
-    public function make_fileresponse_question_allowdownload_allowfilepicker() {
-        return $this->initialise_fileresponse_question();
+    public static function make_fileresponse_question_allowdownload_allowfilepicker() {
+        return self::initialise_fileresponse_question();
     }
 
     /**
@@ -76,15 +78,15 @@ class qtype_fileresponse_test_helper extends question_test_helper {
         $fromform = new stdClass();
 
         $fromform->name = 'File Response question (allow download, allow picker plugins)';
-        $fromform->questiontext = array('text' => 'Please upload three files.', 'format' => FORMAT_HTML);
+        $fromform->questiontext = ['text' => 'Please upload three files.', 'format' => FORMAT_HTML];
         $fromform->defaultmark = 1.0;
-        $fromform->generalfeedback = array('text' => 'I hope your files were okay.',
-            'format' => FORMAT_HTML);
+        $fromform->generalfeedback = ['text' => 'I hope your files were okay.',
+            'format' => FORMAT_HTML, ];
         $fromform->responsefieldlines = 10;
         $fromform->attachments = 1;
         $fromform->allowpickerplugins = 1;
-        $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
-        $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
+        $fromform->graderinfo = ['text' => '', 'format' => FORMAT_HTML];
+        $fromform->responsetemplate = ['text' => '', 'format' => FORMAT_HTML];
 
         return $fromform;
     }
@@ -100,16 +102,16 @@ class qtype_fileresponse_test_helper extends question_test_helper {
         $fromform = new stdClass();
 
         $fromform->name = 'File Response question (disallow download, allow picker plugins)';
-        $fromform->questiontext = array('text' => 'Please upload two files.', 'format' => FORMAT_HTML);
+        $fromform->questiontext = ['text' => 'Please upload two files.', 'format' => FORMAT_HTML];
         $fromform->defaultmark = 1.0;
-        $fromform->generalfeedback = array('text' => 'I hope your files were okay.',
-            'format' => FORMAT_HTML);
+        $fromform->generalfeedback = ['text' => 'I hope your files were okay.',
+            'format' => FORMAT_HTML, ];
         $fromform->responsefieldlines = 10;
         $fromform->attachments = 2;
         $fromform->forcedownload = 1;
         $fromform->allowpickerplugins = 1;
-        $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
-        $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
+        $fromform->graderinfo = ['text' => '', 'format' => FORMAT_HTML];
+        $fromform->responsetemplate = ['text' => '', 'format' => FORMAT_HTML];
 
         return $fromform;
     }
@@ -136,15 +138,15 @@ class qtype_fileresponse_test_helper extends question_test_helper {
         $fromform = new stdClass();
 
         $fromform->name = 'File Response question (disallow download, disallow picker plugins)';
-        $fromform->questiontext = array('text' => 'Please upload a single file.', 'format' => FORMAT_HTML);
+        $fromform->questiontext = ['text' => 'Please upload a single file.', 'format' => FORMAT_HTML];
         $fromform->defaultmark = 1.0;
-        $fromform->generalfeedback = array('text' => 'I hope your file was okay.',
-            'format' => FORMAT_HTML);
+        $fromform->generalfeedback = ['text' => 'I hope your file was okay.',
+            'format' => FORMAT_HTML, ];
         $fromform->responsefieldlines = 10;
         $fromform->attachments = 1;
         $fromform->forcedownload = 1;
-        $fromform->graderinfo = array('text' => '', 'format' => FORMAT_HTML);
-        $fromform->responsetemplate = array('text' => '', 'format' => FORMAT_HTML);
+        $fromform->graderinfo = ['text' => '', 'format' => FORMAT_HTML];
+        $fromform->responsetemplate = ['text' => '', 'format' => FORMAT_HTML];
 
         return $fromform;
     }

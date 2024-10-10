@@ -30,7 +30,7 @@
  */
 class qtype_fileresponse_edit_form extends question_edit_form {
 
-
+    #[\Override]
     protected function definition_inner($mform) {
         $qtype = question_bank::get_qtype('fileresponse');
 
@@ -79,9 +79,10 @@ class qtype_fileresponse_edit_form extends question_edit_form {
         $mform->addElement('header', 'graderinfoheader', get_string('graderinfoheader', 'qtype_fileresponse'));
         $mform->setExpanded('graderinfoheader');
         $mform->addElement('editor', 'graderinfo', get_string('graderinfo', 'qtype_fileresponse'),
-            array('rows' => 10), $this->editoroptions);
+            ['rows' => 10], $this->editoroptions);
     }
 
+    #[\Override]
     protected function data_preprocessing($question) {
         $question = parent::data_preprocessing($question);
 
@@ -98,7 +99,7 @@ class qtype_fileresponse_edit_form extends question_edit_form {
         $question->allowpickerplugins = $question->options->allowpickerplugins;
 
         $draftid = file_get_submitted_draft_itemid('graderinfo');
-        $question->graderinfo = array();
+        $question->graderinfo = [];
         $question->graderinfo['text'] = file_prepare_draft_area(
             $draftid,           // Draftid.
             $this->context->id, // Context.
@@ -112,14 +113,15 @@ class qtype_fileresponse_edit_form extends question_edit_form {
         $question->graderinfo['itemid'] = $draftid;
 
         /* Fileresponse doesn't display a response template. */
-        $question->responsetemplate = array(
+        $question->responsetemplate = [
             'text' => '',
             'format' => FORMAT_HTML,
-        );
+        ];
 
         return $question;
     }
 
+    #[\Override]
     public function validation($fromform, $files) {
         $errors = parent::validation($fromform, $files);
 
@@ -133,6 +135,7 @@ class qtype_fileresponse_edit_form extends question_edit_form {
         return $errors;
     }
 
+    #[\Override]
     public function qtype() {
         return 'fileresponse';
     }

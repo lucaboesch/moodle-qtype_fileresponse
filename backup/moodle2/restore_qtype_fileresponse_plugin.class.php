@@ -15,15 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    qtype_fileresponse
- * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-/**
- * restore plugin class that provides the necessary information
- * needed to restore one fileresponse qtype plugin
+ * Restore plugin class that provides the necessary information needed to restore one fileresponse qtype plugin
  *
+ * @package    qtype_fileresponse
  * @copyright  2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,9 +27,9 @@ class restore_qtype_fileresponse_plugin extends restore_qtype_plugin {
      * Returns the paths to be handled by the plugin at question level
      */
     protected function define_question_plugin_structure() {
-        return array(
-            new restore_path_element('fileresponse', $this->get_pathfor('/fileresponse'))
-        );
+        return [
+            new restore_path_element('fileresponse', $this->get_pathfor('/fileresponse')),
+        ];
     }
 
     /**
@@ -71,9 +65,9 @@ class restore_qtype_fileresponse_plugin extends restore_qtype_plugin {
      * Return the contents of this qtype to be processed by the links decoder
      */
     public static function define_decode_contents() {
-        return array(
+        return [
             new restore_decode_content('qtype_fileresponse_options', 'graderinfo', 'qtype_fileresponse'),
-        );
+        ];
     }
 
     /**
@@ -92,7 +86,7 @@ class restore_qtype_fileresponse_plugin extends restore_qtype_plugin {
                           FROM {qtype_fileresponse_options}
                          WHERE questionid = q.id
                      )
-                ", array('fileresponse'));
+                ", ['fileresponse']);
 
         foreach ($fileresponseswithoutoptions as $q) {
             $defaultoptions = new stdClass();

@@ -43,14 +43,14 @@ require_once($CFG->dirroot . '/question/type/fileresponse/renderer.php');
  * @copyright  based on work by 2007 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_test extends \advanced_testcase {
+final class question_test extends \advanced_testcase {
     /**
      * Test the behaviour of get_question_summary() method.
      *
      * @covers ::get_question_summary
      */
-    public function test_get_question_summary() {
-        $fileresponse = \test_question_maker::make_a_fileresponse_question();
+    public function test_get_question_summary(): void {
+        $fileresponse = \qtype_fileresponse_test_helper::make_fileresponse_question_allowdownload_allowfilepicker();
         $fileresponse->questiontext = 'Hello <img src="http://example.com/globe.png" alt="world" />';
         $this->assertEquals('Hello [world]', $fileresponse->get_question_summary());
     }
@@ -60,11 +60,11 @@ class question_test extends \advanced_testcase {
      *
      * @covers ::summarise_response
      */
-    public function test_summarise_response() {
+    public function test_summarise_response(): void {
         $longstring = str_repeat('0123456789', 50);
-        $fileresponse = \test_question_maker::make_a_fileresponse_question();
+        $fileresponse = \qtype_fileresponse_test_helper::make_fileresponse_question_allowdownload_allowfilepicker();
         $this->assertEquals($longstring, $fileresponse->summarise_response(
-                array('answer' => $longstring, 'answerformat' => FORMAT_HTML)));
+                ['answer' => $longstring, 'answerformat' => FORMAT_HTML]));
     }
 
     /**
@@ -72,48 +72,48 @@ class question_test extends \advanced_testcase {
      *
      * @covers ::is_same_response()
      */
-    public function test_is_same_response() {
-        $fileresponse = \test_question_maker::make_a_fileresponse_question();
+    public function test_is_same_response(): void {
+        $fileresponse = \qtype_fileresponse_test_helper::make_fileresponse_question_allowdownload_allowfilepicker();
 
         $fileresponse->responsetemplate = '';
 
-        $fileresponse->start_attempt(new question_attempt_step(), 1);
+        $fileresponse->start_attempt(new \question_attempt_step(), 1);
 
         $this->assertTrue($fileresponse->is_same_response(
-                array(),
-                array('answer' => '')));
+                [],
+                ['answer' => '']));
 
         $this->assertTrue($fileresponse->is_same_response(
-                array('answer' => ''),
-                array('answer' => '')));
+                ['answer' => ''],
+                ['answer' => '']));
 
         $this->assertTrue($fileresponse->is_same_response(
-                array('answer' => ''),
-                array()));
+                ['answer' => ''],
+                []));
 
         $this->assertFalse($fileresponse->is_same_response(
-                array('answer' => 'Hello'),
-                array()));
+                ['answer' => 'Hello'],
+                []));
 
         $this->assertFalse($fileresponse->is_same_response(
-                array('answer' => 'Hello'),
-                array('answer' => '')));
+                ['answer' => 'Hello'],
+                ['answer' => '']));
 
         $this->assertFalse($fileresponse->is_same_response(
-                array('answer' => 0),
-                array('answer' => '')));
+                ['answer' => 0],
+                ['answer' => '']));
 
         $this->assertFalse($fileresponse->is_same_response(
-                array('answer' => ''),
-                array('answer' => 0)));
+                ['answer' => ''],
+                ['answer' => 0]));
 
         $this->assertFalse($fileresponse->is_same_response(
-                array('answer' => '0'),
-                array('answer' => '')));
+                ['answer' => '0'],
+                ['answer' => '']));
 
         $this->assertFalse($fileresponse->is_same_response(
-                array('answer' => ''),
-                array('answer' => '0')));
+                ['answer' => ''],
+                ['answer' => '0']));
     }
 
     /**
@@ -121,48 +121,48 @@ class question_test extends \advanced_testcase {
      *
      * @covers ::is_same_response()
      */
-    public function test_is_same_response_with_template() {
-        $fileresponse = \test_question_maker::make_a_fileresponse_question();
+    public function test_is_same_response_with_template(): void {
+        $fileresponse = \qtype_fileresponse_test_helper::make_fileresponse_question_allowdownload_allowfilepicker();
 
         $fileresponse->responsetemplate = 'Once upon a time';
 
-        $fileresponse->start_attempt(new question_attempt_step(), 1);
+        $fileresponse->start_attempt(new \question_attempt_step(), 1);
 
         $this->assertTrue($fileresponse->is_same_response(
-                array(),
-                array('answer' => 'Once upon a time')));
+                [],
+                ['answer' => 'Once upon a time']));
 
         $this->assertTrue($fileresponse->is_same_response(
-                array('answer' => ''),
-                array('answer' => 'Once upon a time')));
+                ['answer' => ''],
+                ['answer' => 'Once upon a time']));
 
         $this->assertTrue($fileresponse->is_same_response(
-                array('answer' => 'Once upon a time'),
-                array('answer' => '')));
+                ['answer' => 'Once upon a time'],
+                ['answer' => '']));
 
         $this->assertTrue($fileresponse->is_same_response(
-                array('answer' => ''),
-                array()));
+                ['answer' => ''],
+                []));
 
         $this->assertTrue($fileresponse->is_same_response(
-                array('answer' => 'Once upon a time'),
-                array()));
+                ['answer' => 'Once upon a time'],
+                []));
 
         $this->assertFalse($fileresponse->is_same_response(
-                array('answer' => 0),
-                array('answer' => '')));
+                ['answer' => 0],
+                ['answer' => '']));
 
         $this->assertFalse($fileresponse->is_same_response(
-                array('answer' => ''),
-                array('answer' => 0)));
+                ['answer' => ''],
+                ['answer' => 0]));
 
         $this->assertFalse($fileresponse->is_same_response(
-                array('answer' => '0'),
-                array('answer' => '')));
+                ['answer' => '0'],
+                ['answer' => '']));
 
         $this->assertFalse($fileresponse->is_same_response(
-                array('answer' => ''),
-                array('answer' => '0')));
+                ['answer' => ''],
+                ['answer' => '0']));
     }
 
     /**
@@ -170,18 +170,18 @@ class question_test extends \advanced_testcase {
      *
      * @covers ::is_complete_response()
      */
-    public function test_is_complete_response() {
+    public function test_is_complete_response(): void {
 
-        $fileresponse = \test_question_maker::make_a_fileresponse_question();
-        $fileresponse->start_attempt(new question_attempt_step(), 1);
+        $fileresponse = \qtype_fileresponse_test_helper::make_fileresponse_question_allowdownload_allowfilepicker();
+        $fileresponse->start_attempt(new \question_attempt_step(), 1);
 
         // The empty string should be considered an empty response, as should a lack of a response.
-        $this->assertFalse($fileresponse->is_complete_response(array('answer' => '')));
-        $this->assertFalse($fileresponse->is_complete_response(array()));
+        $this->assertFalse($fileresponse->is_complete_response(['answer' => '']));
+        $this->assertFalse($fileresponse->is_complete_response([]));
 
         // Any nonempty string should be considered a complete response.
-        $this->assertTrue($fileresponse->is_complete_response(array('answer' => 'A student response.')));
-        $this->assertTrue($fileresponse->is_complete_response(array('answer' => '0 times.')));
-        $this->assertTrue($fileresponse->is_complete_response(array('answer' => '0')));
+        $this->assertTrue($fileresponse->is_complete_response(['answer' => 'A student response.']));
+        $this->assertTrue($fileresponse->is_complete_response(['answer' => '0 times.']));
+        $this->assertTrue($fileresponse->is_complete_response(['answer' => '0']));
     }
 }
