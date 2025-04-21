@@ -43,7 +43,9 @@ require_once($CFG->dirroot . '/question/type/fileresponse/edit_fileresponse_form
  * @copyright  based on work by 2007 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_type_test  extends \advanced_testcase {
+final class question_type_test extends \advanced_testcase {
+
+    /** @var fileresponse instance of the question type class to test. */
     protected $qtype;
 
     /**
@@ -51,6 +53,7 @@ class question_type_test  extends \advanced_testcase {
      * @var array
      */
     protected function setUp(): void {
+        parent::setUp();
         $this->qtype = new \qtype_fileresponse();
     }
 
@@ -59,6 +62,7 @@ class question_type_test  extends \advanced_testcase {
      * @var array
      */
     protected function tearDown(): void {
+        parent::tearDown();
         $this->qtype = null;
     }
 
@@ -78,7 +82,7 @@ class question_type_test  extends \advanced_testcase {
      *
      * @covers ::name()
      */
-    public function test_name() {
+    public function test_name(): void {
         $this->assertEquals($this->qtype->name(), 'fileresponse');
     }
 
@@ -87,7 +91,7 @@ class question_type_test  extends \advanced_testcase {
      *
      * @covers ::can_analyse_responses()
      */
-    public function test_can_analyse_responses() {
+    public function test_can_analyse_responses(): void {
         $this->assertFalse($this->qtype->can_analyse_responses());
     }
 
@@ -96,7 +100,7 @@ class question_type_test  extends \advanced_testcase {
      *
      * @covers ::get_random_guess_score()
      */
-    public function test_get_random_guess_score() {
+    public function test_get_random_guess_score(): void {
         $q = $this->get_test_question_data();
         $this->assertEquals(0, $this->qtype->get_random_guess_score($q));
     }
@@ -106,9 +110,9 @@ class question_type_test  extends \advanced_testcase {
      *
      * @covers ::get_possible_responses()
      */
-    public function test_get_possible_responses() {
+    public function test_get_possible_responses(): void {
         $q = $this->get_test_question_data();
-        $this->assertEquals(array(), $this->qtype->get_possible_responses($q));
+        $this->assertEquals([], $this->qtype->get_possible_responses($q));
 
     }
 }

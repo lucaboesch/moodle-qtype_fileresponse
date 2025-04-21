@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Privacy Subsystem implementation for qtype_fileresponse.
+ *
  * @package    qtype_fileresponse
  * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,12 +27,18 @@ namespace qtype_fileresponse\privacy;
 /**
  * Privacy Subsystem for qtype_fileresponse implementing null_provider.
  *
- *
+ * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class provider implements \core_privacy\local\metadata\null_provider {
 
-    public static function get_reason() : string {
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason(): string {
         return 'privacy:metadata';
     }
 }
