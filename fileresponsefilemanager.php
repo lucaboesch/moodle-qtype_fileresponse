@@ -26,6 +26,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+// phpcs:disable NormalizedArrays.Arrays.CommaAfterLast.MissingMultiLine
+// phpcs:disable Generic.Arrays.DisallowLongArraySyntax
+// phpcs:disable moodle.Commenting.MissingDocblock.Function
+// phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseMethod
+
 global $CFG;
 
 require_once('HTML/QuickForm/element.php');
@@ -50,10 +55,10 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
     /** @var string html for help button, if empty then no help will icon will be displayed. */
     public $_helpbutton = '';
 
-    /** @var array options provided to initalize fileresponsefilemanager */
     // PHP doesn't support 'key' => $value1 | $value2 in class definition.
     // We cannot do $_options = array('return_types'=> FILE_INTERNAL | FILE_REFERENCE);
     // So I have to set null here, and do it in constructor.
+    /** @var array options provided to initalize fileresponsefilemanager */
     protected $_options = array('mainfile' => '', 'subdirs' => 1, 'maxbytes' => -1,
         'maxfiles' => -1, 'accepted_types' => '*', 'return_types' => null,
         'areamaxbytes' => FILE_AREA_MAX_BYTES_UNLIMITED
@@ -88,8 +93,6 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
         parent::__construct($elementname, $elementlabel, $attributes);
     }
 
-    // @codingStandardsIgnoreStart
-
     /**
      * Called by HTML_QuickForm whenever form event is made on this element
      *
@@ -106,8 +109,6 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
         }
         return parent::onQuickFormEvent($event, $arg, $caller);
     }
-
-    // @codingStandardsIgnoreEnd
 
     /**
      * Sets name of fileresponsefilemanager
@@ -252,7 +253,7 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
 
         // Security - never ever allow guest/not logged in user to upload anything or use this
         // element!
-        if (isguestuser() or !isloggedin()) {
+        if (isguestuser() || !isloggedin()) {
             throw new moodle_exception('noguest');
         }
 
@@ -320,8 +321,6 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
         return $context;
     }
 
-    // @codingStandardsIgnoreStart
-
     /**
      * Check that all files have the allowed type.
      *
@@ -368,8 +367,6 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
     }
 }
 
-// @codingStandardsIgnoreEnd
-
 /**
  * Data structure representing a fileresponse file manager.
  *
@@ -380,7 +377,6 @@ class MoodleQuickForm_fileresponsefilemanager extends HTML_QuickForm_element imp
  * @package    qtype_fileresponse
  * @copyright  2012 Luca Bösch luca.boesch@bfh.ch
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @todo do not use this abstraction (skodak)
  */
 class form_fileresponsefilemanager implements renderable {
 
@@ -465,7 +461,9 @@ class form_fileresponsefilemanager implements renderable {
 
         $this->options->userprefs = array();
         $this->options->userprefs['recentviewmode'] = get_user_preferences('filemanager_recentviewmode', '');
-        user_preference_allow_ajax_update('filemanager_recentviewmode', PARAM_INT);
+        if (!in_array($CFG->branch, ['403', '404', '405', '406', '500'])) {
+            user_preference_allow_ajax_update('filemanager_recentviewmode', PARAM_INT);
+        }
 
         // Building file picker options.
         $params = new stdClass();
@@ -501,15 +499,17 @@ class form_fileresponsefilemanager implements renderable {
                 'maxbytes' => $this->options->maxbytes,
                 'areamaxbytes' => $this->options->areamaxbytes,
                 'maxfiles' => $this->options->maxfiles,
-                'ctx_id' => $PAGE->context->id,  // TODO ?
-                'course' => $PAGE->course->id, // TODO ?
+                'ctx_id' => $PAGE->context->id,
+                'course' => $PAGE->course->id,
                 'sesskey' => sesskey()
             )
         );
     }
 }
 
-
+/**
+ * A clone of the file manager renderer class with adoptions to the fileresponse question type.
+ */
 class qtype_fileresponse_fileresponsefilemanager_renderer extends plugin_renderer_base {
 
     /**

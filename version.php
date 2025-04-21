@@ -23,10 +23,10 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2023011600;
+$plugin->version = 2025042100;
 $plugin->requires = 2017110800;
 $plugin->cron      = 0;
 $plugin->component = 'qtype_fileresponse';
-$plugin->supported = [36, 400];
+$plugin->supported = [400, 500];
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release   = 'v4.0-r1';
+$plugin->release   = 'v5.0-r1';

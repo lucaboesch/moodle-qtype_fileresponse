@@ -32,10 +32,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_fileresponse_qe2_attempt_updater extends question_qtype_attempt_updater {
+    #[\Override]
     public function right_answer() {
         return '';
     }
 
+    #[\Override]
     public function response_summary($state) {
         if (!empty($state->answer)) {
             return $this->to_text($state->answer);
@@ -44,16 +46,20 @@ class qtype_fileresponse_qe2_attempt_updater extends question_qtype_attempt_upda
         }
     }
 
+    #[\Override]
     public function was_answered($state) {
         return !empty($state->answer);
     }
 
+    #[\Override]
     public function set_first_step_data_elements($state, &$data) {
     }
 
+    #[\Override]
     public function supply_missing_first_step_data(&$data) {
     }
 
+    #[\Override]
     public function set_data_elements_for_step($state, &$data) {
         if (!empty($state->answer)) {
             $data['answer'] = $state->answer;

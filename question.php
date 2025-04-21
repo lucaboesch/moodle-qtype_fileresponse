@@ -22,6 +22,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// phpcs:disable moodle.Commenting.VariableComment.Missing
+// phpcs:disable moodle.Commenting.MissingDocblock.Function
+// phpcs:disable moodle.Commenting.DocblockDescription.Missing
+// phpcs:disable Generic.Arrays.DisallowLongArraySyntax
+
 /**
  * Represents a fileresponse question.
  *
@@ -60,7 +65,7 @@ class qtype_fileresponse_question extends question_with_responses {
     }
 
     /**
-     * @param moodle_page the page we are outputting to.
+     * @param moodle_page $page the page we are outputting to.
      * @return qtype_fileresponse_format_renderer_base the response-format-specific renderer.
      */
     public function get_format_renderer(moodle_page $page) {

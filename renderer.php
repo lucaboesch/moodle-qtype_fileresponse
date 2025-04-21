@@ -24,6 +24,10 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+// phpcs:disable Generic.Arrays.DisallowLongArraySyntax
+// phpcs:disable NormalizedArrays.Arrays.CommaAfterLast.MissingMultiLine
+// phpcs:disable moodle.Commenting.MissingDocblock.Function
+// phpcs:disable moodle.Commenting.DocblockDescription.Missing
 
 /**
  * Generates the output for fileresponse questions.
@@ -278,8 +282,9 @@ class qtype_fileresponse_renderer extends qtype_renderer {
 
     /**
      * Count how many files have already been uploaded.
-     * @param $qa the question attempt that will be displayed on the page.
-     * @param $options the options
+     *
+     * @param question_attempt $qa the question attempt that will be displayed on the page.
+     * @param array $options the options
      * @return int how many files have already been uploaded
      */
     public function get_already_uploaded_files_number($qa, $options) {
@@ -605,6 +610,11 @@ class qtype_fileresponse_format_editorfilepicker_renderer extends qtype_fileresp
  */
 class qtype_fileresponse_format_plain_renderer extends plugin_renderer_base {
     /**
+     * Render the textarea for the response.
+     *
+     * @param string $response The response text.
+     * @param int $lines The number of lines to display.
+     * @param array $attributes The attributes to add to the textarea.
      * @return string the HTML for the textarea.
      */
     protected function textarea($response, $lines, $attributes) {
